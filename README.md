@@ -1,4 +1,4 @@
-# Prism Hero
+# Hero Builder
 
 A fully customizable, animated hero banner for your Flarum 2 discussion list.
 
@@ -7,4 +7,4 @@ A fully customizable, animated hero banner for your Flarum 2 discussion list.
 - Optional live community stats
 - No core files touched
 
-Configure it in **Admin → Extensions → Prism Hero**.
+Configure it in **Admin → Extensions → Hero Builder**.

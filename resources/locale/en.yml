@@ -1,6 +1,6 @@
-ernestdefoe-prism-hero:
+ernestdefoe-hero-builder:
   admin:
-    enabled: Show the Prism hero on the discussion list
+    enabled: Show the hero banner on the discussion list
     title: Title
     title_placeholder: Defaults to your forum title
     subtitle: Subtitle

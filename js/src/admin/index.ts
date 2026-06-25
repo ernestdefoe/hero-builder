@@ -2,8 +2,8 @@ import app from 'flarum/admin/app';
 
 // The Hero Studio: a simple, complete settings form. The icon is a free-text
 // Font Awesome field (type any class — not a fixed preset list).
-app.initializers.add('ernestdefoe-prism-hero', () => {
-  const K = 'ernestdefoe-prism-hero';
+app.initializers.add('ernestdefoe-hero-builder', () => {
+  const K = 'ernestdefoe-hero-builder';
   const t = (k: string) => app.translator.trans(`${K}.admin.${k}`);
 
   app.extensionData

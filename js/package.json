@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@ernestdefoe/prism-hero",
+  "name": "@ernestdefoe/hero-builder",
   "version": "1.0.0",
   "description": "A customizable, animated hero banner for Flarum 2",
   "dependencies": {},

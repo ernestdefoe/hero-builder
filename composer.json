@@ -1,5 +1,5 @@
 {
-  "name": "ernestdefoe/prism-hero",
+  "name": "ernestdefoe/hero-builder",
   "description": "A fully customizable, animated hero banner for your Flarum discussion list — set the title, subtitle, any Font Awesome icon, a colour palette or a cover image, and live community stats. A polished, modern welcome.",
   "keywords": ["flarum", "flarum-extension", "hero", "banner", "welcome", "customization"],
   "type": "flarum-extension",
@@ -10,10 +10,10 @@
       "email": "ernestdefoe@gmail.com"
     }
   ],
-  "homepage": "https://github.com/ernestdefoe/prism-hero",
+  "homepage": "https://github.com/ernestdefoe/hero-builder",
   "support": {
-    "issues": "https://github.com/ernestdefoe/prism-hero/issues",
-    "source": "https://github.com/ernestdefoe/prism-hero"
+    "issues": "https://github.com/ernestdefoe/hero-builder/issues",
+    "source": "https://github.com/ernestdefoe/hero-builder"
   },
   "require": {
     "php": "^8.3",
@@ -21,7 +21,7 @@
   },
   "extra": {
     "flarum-extension": {
-      "title": "Prism Hero",
+      "title": "Hero Builder",
       "category": "theme",
       "icon": {
         "name": "fas fa-meteor",

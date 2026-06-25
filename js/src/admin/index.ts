@@ -1,19 +1,8 @@
 import app from 'flarum/admin/app';
 
-// The Hero Studio: a simple, complete settings form. The icon is a free-text
-// Font Awesome field (type any class — not a fixed preset list).
-app.initializers.add('ernestdefoe-hero-builder', () => {
-  const K = 'ernestdefoe-hero-builder';
-  const t = (k: string) => app.translator.trans(`${K}.admin.${k}`);
+// Settings are declared via the JS Admin extender in ./extend (the Flarum 2
+// pattern that replaced the removed 1.x app.extensionData API). The initializer
+// is kept as a hook for any future admin-side preview/dashboard logic.
+app.initializers.add('ernestdefoe-hero-builder', () => {});
 
-  app.extensionData
-    .for(K)
-    .registerSetting({ setting: `${K}.enabled`, type: 'boolean', label: t('enabled') })
-    .registerSetting({ setting: `${K}.title`, type: 'text', label: t('title'), placeholder: t('title_placeholder') })
-    .registerSetting({ setting: `${K}.subtitle`, type: 'text', label: t('subtitle') })
-    .registerSetting({ setting: `${K}.icon`, type: 'text', label: t('icon'), help: t('icon_help'), placeholder: 'fas fa-meteor' })
-    .registerSetting({ setting: `${K}.c1`, type: 'text', label: t('c1'), placeholder: '#7c3aed' })
-    .registerSetting({ setting: `${K}.c2`, type: 'text', label: t('c2'), placeholder: '#ec4899' })
-    .registerSetting({ setting: `${K}.image`, type: 'text', label: t('image'), help: t('image_help') })
-    .registerSetting({ setting: `${K}.showStats`, type: 'boolean', label: t('show_stats') });
-});
+export { default as extend } from './extend';

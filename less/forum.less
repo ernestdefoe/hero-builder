@@ -53,3 +53,25 @@
   .HeroBanner-title { font-size: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { .HeroBanner-blob, .HeroBanner-sheen { animation: none; } }
+
+/* ── Hero Studio (admin live editor) ───────────────────────────────── */
+.HeroStudio { margin-top: 8px; }
+.HeroStudio-label { display: block; font-weight: 600; margin-bottom: 6px; }
+.HeroStudio-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.HeroStudio-tab {
+  border: 1px solid var(--control-bg, rgba(0, 0, 0, 0.1));
+  background: var(--body-bg, #fff); color: inherit;
+  padding: 5px 12px; border-radius: 999px; cursor: pointer; font-size: 13px;
+}
+.HeroStudio-tab.active { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+.HeroStudio-tab .icon { opacity: 0.7; margin-right: 2px; }
+.HeroStudio-loading { color: var(--muted-color, #888); font-size: 13px; }
+.HeroStudio-preview { margin-bottom: 16px; }
+.HeroStudio-preview[data-off='true'] { opacity: 0.4; filter: grayscale(0.4); }
+.HeroStudio-fields { display: grid; gap: 12px; }
+.HeroStudio-field label { font-weight: 600; display: block; margin-bottom: 4px; }
+.HeroStudio-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.HeroStudio-colorRow { display: flex; gap: 8px; align-items: center; }
+.HeroStudio-colorRow input[type='color'] { width: 42px; height: 38px; padding: 0; border: none; background: none; cursor: pointer; }
+.HeroStudio-colorRow .FormControl { flex: 1; }
+.HeroStudio-toggle label { font-weight: 500; cursor: pointer; }

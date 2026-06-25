@@ -1,0 +1,16 @@
+ernestdefoe-prism-hero:
+  admin:
+    enabled: Show the Prism hero on the discussion list
+    title: Title
+    title_placeholder: Defaults to your forum title
+    subtitle: Subtitle
+    icon: Icon (Font Awesome)
+    icon_help: "Type any Font Awesome class — e.g. fas fa-dragon, fas fa-fire, fab fa-discord."
+    c1: Gradient colour 1
+    c2: Gradient colour 2
+    image: Cover image URL
+    image_help: Optional. A full image URL shown instead of the gradient.
+    show_stats: Show community stats
+  forum:
+    discussions: Discussions
+    posts: Posts

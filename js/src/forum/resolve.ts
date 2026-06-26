@@ -55,6 +55,8 @@ export function resolveHero(): HeroCfg | null {
     image: override.image || undefined,
     showStats: override.showStats !== false,
     stats,
+    height: Number(override.height) || undefined,
+    width: Number(override.width) || undefined,
   };
 }
 

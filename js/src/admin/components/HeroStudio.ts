@@ -5,7 +5,7 @@ import { heroView, HeroCfg, HERO_DEFAULTS } from '../../common/heroView';
 declare const m: import('mithril').Static;
 
 type Ctx = { key: string; label: string; tag?: any };
-type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean };
+type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; height?: number; width?: number };
 
 /**
  * The Hero Studio — a live editor. Pick a context (the home page or any tag),
@@ -83,6 +83,8 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       image: e.image || undefined,
       showStats: e.showStats !== false,
       stats: e.showStats !== false ? [{ value: '128', icon: 'fas fa-comments', label: 'Discussions' }] : [],
+      height: Number(e.height) || undefined,
+      width: Number(e.width) || undefined,
     };
   }
 
@@ -119,8 +121,26 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
         this.text('icon', t('icon'), e.icon, this.preview().icon, t('icon_help') as any),
         m('div.HeroStudio-row', [this.color('c1', t('c1'), e.c1, this.preview().c1), this.color('c2', t('c2'), e.c2, this.preview().c2)]),
         this.text('image', t('image'), e.image, '', t('image_help') as any),
+        m('div.HeroStudio-row', [
+          this.num('height', t('height'), e.height, '150', t('height_help') as any),
+          this.num('width', t('width'), e.width, t('width_ph') as any),
+        ]),
         this.toggle('showStats', t('show_stats'), e.showStats !== false),
       ]),
+    ]);
+  }
+
+  num(field: keyof Entry, label: string, val: any, placeholder: any, help?: string) {
+    return m('div.Form-group.HeroStudio-field', [
+      m('label', label),
+      m('input.FormControl', {
+        type: 'number',
+        min: 0,
+        value: val ?? '',
+        placeholder: placeholder || '',
+        oninput: (ev: any) => this.set(field, ev.target.value === '' ? undefined : Number(ev.target.value)),
+      }),
+      help ? m('p.helpText', help) : null,
     ]);
   }
 

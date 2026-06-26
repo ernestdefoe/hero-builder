@@ -10,6 +10,10 @@ export interface HeroCfg {
   image?: string;
   showStats?: boolean;
   stats?: Array<{ value: string; icon: string; label: string }>;
+  /** Banner min-height in px (falls back to the CSS default when unset). */
+  height?: number;
+  /** Max banner width in px, centered (full width when unset). */
+  width?: number;
 }
 
 /** The default look when nothing is configured. */
@@ -22,8 +26,15 @@ export const HERO_DEFAULTS = { icon: 'fas fa-meteor', c1: '#7c3aed', c2: '#ec489
  */
 export function heroView(cfg: HeroCfg) {
   const grad = `linear-gradient(135deg, ${cfg.c1}, ${cfg.c2})`;
+  const style: Record<string, string> = { background: cfg.image ? '#0b0a14' : grad };
+  if (cfg.height) style.minHeight = cfg.height + 'px';
+  if (cfg.width) {
+    style.maxWidth = cfg.width + 'px';
+    style.marginLeft = 'auto';
+    style.marginRight = 'auto';
+  }
 
-  return m('div.HeroBanner', { style: { background: cfg.image ? '#0b0a14' : grad } }, [
+  return m('div.HeroBanner', { style }, [
     cfg.image ? m('img.HeroBanner-cover', { src: cfg.image, alt: '' }) : null,
     m('span.HeroBanner-blob', {
       style: { background: `radial-gradient(circle, ${cfg.c1}, transparent 70%)`, left: '-50px', top: '-80px' },

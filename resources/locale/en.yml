@@ -15,6 +15,10 @@ ernestdefoe-hero-builder:
       c2: Gradient colour 2
       image: Cover image URL
       image_help: Optional. A full image URL shown instead of the gradient.
+      height: Height (px)
+      height_help: Optional. Banner height in pixels (defaults to 150).
+      width: Max width (px)
+      width_ph: Full width
       show_stats: Show stats
   forum:
     discussions: Discussions

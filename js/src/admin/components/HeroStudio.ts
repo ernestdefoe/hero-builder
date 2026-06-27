@@ -5,7 +5,7 @@ import { heroView, HeroCfg, HERO_DEFAULTS } from '../../common/heroView';
 declare const m: import('mithril').Static;
 
 type Ctx = { key: string; label: string; tag?: any };
-type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; height?: number; width?: number };
+type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; height?: number; width?: number; iconBg?: boolean; sharpCorners?: boolean };
 
 /**
  * The Hero Studio — a live editor. Pick a context (the home page or any tag),
@@ -85,6 +85,8 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       stats: e.showStats !== false ? [{ value: '128', icon: 'fas fa-comments', label: 'Discussions' }] : [],
       height: Number(e.height) || undefined,
       width: Number(e.width) || undefined,
+      iconBg: e.iconBg !== false,
+      sharpCorners: e.sharpCorners === true,
     };
   }
 
@@ -119,12 +121,14 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
         this.text('title', t('title'), e.title, this.preview().title),
         this.text('subtitle', t('subtitle'), e.subtitle, ''),
         this.text('icon', t('icon'), e.icon, this.preview().icon, t('icon_help') as any),
+        this.toggle('iconBg', t('icon_bg'), e.iconBg !== false),
         m('div.HeroStudio-row', [this.color('c1', t('c1'), e.c1, this.preview().c1), this.color('c2', t('c2'), e.c2, this.preview().c2)]),
         this.text('image', t('image'), e.image, '', t('image_help') as any),
         m('div.HeroStudio-row', [
           this.num('height', t('height'), e.height, '150', t('height_help') as any),
           this.num('width', t('width'), e.width, t('width_ph') as any),
         ]),
+        this.toggle('sharpCorners', t('sharp_corners'), e.sharpCorners === true),
         this.toggle('showStats', t('show_stats'), e.showStats !== false),
       ]),
     ]);

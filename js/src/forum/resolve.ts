@@ -57,6 +57,8 @@ export function resolveHero(): HeroCfg | null {
     stats,
     height: Number(override.height) || undefined,
     width: Number(override.width) || undefined,
+    iconBg: override.iconBg !== false,
+    sharpCorners: override.sharpCorners === true,
   };
 }
 

@@ -14,6 +14,10 @@ export interface HeroCfg {
   height?: number;
   /** Max banner width in px, centered (full width when unset). */
   width?: number;
+  /** Show the icon + its rounded background square. Off → no icon at all. Default on. */
+  iconBg?: boolean;
+  /** Use square (sharp) corners instead of the default rounded ones. */
+  sharpCorners?: boolean;
 }
 
 /** The default look when nothing is configured. */
@@ -34,7 +38,7 @@ export function heroView(cfg: HeroCfg) {
     style.marginRight = 'auto';
   }
 
-  return m('div.HeroBanner', { style }, [
+  return m('div.HeroBanner', { className: cfg.sharpCorners ? 'HeroBanner--sharp' : '', style }, [
     cfg.image ? m('img.HeroBanner-cover', { src: cfg.image, alt: '' }) : null,
     m('span.HeroBanner-blob', {
       style: { background: `radial-gradient(circle, ${cfg.c1}, transparent 70%)`, left: '-50px', top: '-80px' },
@@ -53,7 +57,9 @@ export function heroView(cfg: HeroCfg) {
     m('span.HeroBanner-sheen', { 'aria-hidden': 'true' }),
     m('span.HeroBanner-wash', { 'aria-hidden': 'true' }),
     m('div.HeroBanner-body', [
-      m('div.HeroBanner-badge', m('i', { className: cfg.icon || HERO_DEFAULTS.icon, 'aria-hidden': 'true' })),
+      cfg.iconBg !== false
+        ? m('div.HeroBanner-badge', m('i', { className: cfg.icon || HERO_DEFAULTS.icon, 'aria-hidden': 'true' }))
+        : null,
       m('div.HeroBanner-text', [
         m('h1.HeroBanner-title', cfg.title),
         cfg.subtitle ? m('p.HeroBanner-subtitle', cfg.subtitle) : null,

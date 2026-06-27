@@ -11,6 +11,8 @@ ernestdefoe-hero-builder:
       subtitle: Subtitle
       icon: Icon (Font Awesome)
       icon_help: "Type any Font Awesome class — e.g. fas fa-dragon, fas fa-fire, fab fa-discord."
+      icon_bg: Show icon (with its background square)
+      sharp_corners: Sharp corners (instead of rounded)
       c1: Gradient colour 1
       c2: Gradient colour 2
       image: Cover image URL

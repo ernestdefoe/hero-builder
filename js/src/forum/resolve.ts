@@ -46,6 +46,12 @@ export function resolveHero(): HeroCfg | null {
     };
   }
 
+  // Admin-defined custom stats (any context, incl. the home hero which has no
+  // auto stat) take priority over the tag-derived count.
+  const customStats = (Array.isArray(override.stats) ? override.stats : [])
+    .filter((s: any) => s && (String(s.value ?? '').trim() !== '' || String(s.label ?? '').trim() !== ''))
+    .map((s: any) => ({ value: String(s.value ?? ''), icon: s.icon || 'fas fa-circle-info', label: s.label || '' }));
+
   return {
     title: override.title || base.title || '',
     subtitle: override.subtitle ?? base.subtitle,
@@ -54,7 +60,7 @@ export function resolveHero(): HeroCfg | null {
     c2: override.c2 || base.c2 || HERO_DEFAULTS.c2,
     image: override.image || undefined,
     showStats: override.showStats !== false,
-    stats,
+    stats: customStats.length ? customStats : stats,
     height: Number(override.height) || undefined,
     width: Number(override.width) || undefined,
     iconBg: override.iconBg !== false,

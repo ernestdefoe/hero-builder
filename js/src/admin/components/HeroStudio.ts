@@ -5,7 +5,15 @@ import { heroView, HeroCfg, HERO_DEFAULTS } from '../../common/heroView';
 declare const m: import('mithril').Static;
 
 type Ctx = { key: string; label: string; tag?: any };
-type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; height?: number; width?: number; iconBg?: boolean; sharpCorners?: boolean };
+type Stat = { value?: string; icon?: string; label?: string };
+type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; stats?: Stat[]; height?: number; width?: number; iconBg?: boolean; sharpCorners?: boolean };
+
+/** Custom stats → renderable form (drops blank rows, fills an icon default). */
+function cleanStats(stats?: Stat[]) {
+  return (Array.isArray(stats) ? stats : [])
+    .filter((s) => s && (String(s.value ?? '').trim() !== '' || String(s.label ?? '').trim() !== ''))
+    .map((s) => ({ value: String(s.value ?? ''), icon: s.icon || 'fas fa-circle-info', label: s.label || '' }));
+}
 
 /**
  * The Hero Studio — a live editor. Pick a context (the home page or any tag),
@@ -82,7 +90,12 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       c2: e.c2 || HERO_DEFAULTS.c2,
       image: e.image || undefined,
       showStats: e.showStats !== false,
-      stats: e.showStats !== false ? [{ value: '128', icon: 'fas fa-comments', label: 'Discussions' }] : [],
+      stats:
+        e.showStats === false
+          ? []
+          : cleanStats(e.stats).length
+            ? cleanStats(e.stats)
+            : [{ value: '128', icon: 'fas fa-comments', label: 'Discussions' }],
       height: Number(e.height) || undefined,
       width: Number(e.width) || undefined,
       iconBg: e.iconBg !== false,
@@ -130,6 +143,7 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
         ]),
         this.toggle('sharpCorners', t('sharp_corners'), e.sharpCorners === true),
         this.toggle('showStats', t('show_stats'), e.showStats !== false),
+        e.showStats !== false ? this.statsEditor() : null,
       ]),
     ]);
   }
@@ -180,5 +194,39 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
         label,
       ]),
     ]);
+  }
+
+  /** Repeatable custom-stat editor (value / FA icon / label). Lets ANY hero —
+   *  including the home page, which has no auto stat — show stats in the header. */
+  statsEditor() {
+    const t = (k: string) => app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`);
+    const rows: Stat[] = Array.isArray(this.entry().stats) ? (this.entry().stats as Stat[]) : [];
+    return m('div.Form-group.HeroStudio-field.HeroStudio-stats', [
+      m('label', t('stats_custom')),
+      m('p.helpText', t('stats_custom_help')),
+      rows.map((s, i) =>
+        m('div.HeroStudio-statRow', [
+          m('input.FormControl', { type: 'text', placeholder: t('stat_value'), value: s.value || '', oninput: (ev: any) => this.setStat(i, 'value', ev.target.value) }),
+          m('input.FormControl', { type: 'text', placeholder: t('stat_icon'), value: s.icon || '', oninput: (ev: any) => this.setStat(i, 'icon', ev.target.value) }),
+          m('input.FormControl', { type: 'text', placeholder: t('stat_label'), value: s.label || '', oninput: (ev: any) => this.setStat(i, 'label', ev.target.value) }),
+          m('button.Button.Button--icon.HeroStudio-statDel', { type: 'button', title: t('stat_remove'), onclick: () => this.removeStat(i) }, m('i.fas.fa-times')),
+        ])
+      ),
+      m('button.Button.Button--text.HeroStudio-statAdd', { type: 'button', onclick: () => this.addStat() }, [m('i.fas.fa-plus'), ' ', t('stat_add')]),
+    ]);
+  }
+
+  addStat() {
+    this.set('stats', [...(this.entry().stats || []), { value: '', icon: 'fas fa-comments', label: '' }]);
+  }
+
+  setStat(i: number, field: keyof Stat, val: string) {
+    const arr: Stat[] = [...(this.entry().stats || [])];
+    arr[i] = { ...arr[i], [field]: val };
+    this.set('stats', arr);
+  }
+
+  removeStat(i: number) {
+    this.set('stats', (this.entry().stats || []).filter((_: Stat, j: number) => j !== i));
   }
 }

@@ -23,6 +23,28 @@ export interface HeroCfg {
 /** The default look when nothing is configured. */
 export const HERO_DEFAULTS = { icon: 'fas fa-meteor', c1: '#7c3aed', c2: '#ec4899' };
 
+/** Compact a number: 1234 → "1.2k". */
+export function fmtCount(n?: number): string {
+  const v = n ?? 0;
+  return v >= 1000 ? Math.round(v / 100) / 10 + 'k' : String(v);
+}
+
+/**
+ * Build the home hero's default LIVE stats from the forum counts attribute
+ * (`heroBuilderStats`, exposed by the backend) — real numbers, not typed ones.
+ */
+export function forumStats(
+  s: { discussions?: number; posts?: number; users?: number } | null | undefined,
+  labels: { discussions: string; posts: string; members: string }
+): HeroCfg['stats'] {
+  if (!s) return [];
+  return [
+    { value: fmtCount(s.discussions), icon: 'fas fa-comments', label: labels.discussions },
+    { value: fmtCount(s.posts), icon: 'fas fa-pen-to-square', label: labels.posts },
+    { value: fmtCount(s.users), icon: 'fas fa-users', label: labels.members },
+  ];
+}
+
 /**
  * Render the hero as a Mithril vnode tree. Pure — given a resolved config it
  * returns identical markup whether called from the forum (the real hero) or the

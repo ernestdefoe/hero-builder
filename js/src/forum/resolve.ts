@@ -1,5 +1,5 @@
 import app from 'flarum/forum/app';
-import { HeroCfg, HERO_DEFAULTS } from '../common/heroView';
+import { HeroCfg, HERO_DEFAULTS, forumStats } from '../common/heroView';
 
 declare const m: import('mithril').Static;
 
@@ -44,6 +44,13 @@ export function resolveHero(): HeroCfg | null {
       c1: HERO_DEFAULTS.c1,
       c2: HERO_DEFAULTS.c2,
     };
+    // The home hero has no tag to derive a count from, so use the live forum
+    // totals exposed by the backend (discussions / posts / members).
+    stats = forumStats(app.forum.attribute('heroBuilderStats') as any, {
+      discussions: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any,
+      posts: app.translator.trans('ernestdefoe-hero-builder.forum.posts') as any,
+      members: app.translator.trans('ernestdefoe-hero-builder.forum.members') as any,
+    });
   }
 
   // Admin-defined custom stats (any context, incl. the home hero which has no

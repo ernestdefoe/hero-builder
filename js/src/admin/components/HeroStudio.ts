@@ -1,6 +1,6 @@
 import app from 'flarum/admin/app';
 import Component from 'flarum/common/Component';
-import { heroView, HeroCfg, HERO_DEFAULTS } from '../../common/heroView';
+import { heroView, HeroCfg, HERO_DEFAULTS, forumStats } from '../../common/heroView';
 
 declare const m: import('mithril').Static;
 
@@ -95,7 +95,13 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
           ? []
           : cleanStats(e.stats).length
             ? cleanStats(e.stats)
-            : [{ value: '128', icon: 'fas fa-comments', label: 'Discussions' }],
+            : tag
+              ? [{ value: String(tag.discussionCount?.() ?? 0), icon: 'fas fa-comments', label: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any }]
+              : forumStats(app.forum?.attribute?.('heroBuilderStats') as any, {
+                  discussions: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any,
+                  posts: app.translator.trans('ernestdefoe-hero-builder.forum.posts') as any,
+                  members: app.translator.trans('ernestdefoe-hero-builder.forum.members') as any,
+                }),
       height: Number(e.height) || undefined,
       width: Number(e.width) || undefined,
       iconBg: e.iconBg !== false,

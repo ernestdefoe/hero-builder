@@ -6,7 +6,7 @@ declare const m: import('mithril').Static;
 
 type Ctx = { key: string; label: string; tag?: any };
 type Stat = { value?: string; icon?: string; label?: string };
-type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; stats?: Stat[]; height?: number; width?: number; iconBg?: boolean; sharpCorners?: boolean };
+type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; stats?: Stat[]; height?: number; width?: number; iconBg?: boolean; sharpCorners?: boolean; borderWidth?: number; borderColor?: string; shadow?: string; marginTop?: number; marginBottom?: number };
 
 /** Custom stats → renderable form (drops blank rows, fills an icon default). */
 function cleanStats(stats?: Stat[]) {
@@ -43,7 +43,10 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       app.store
         .find('tags')
         .then((tags: any) => {
-          this.tags = (Array.isArray(tags) ? tags : []).filter((t: any) => !t.isChild || !t.isChild());
+          const all = (Array.isArray(tags) ? tags : []) as any[];
+          const isChild = (t: any) => !!(t.isChild && t.isChild());
+          // Primary tags first, then their children — both get their own hero.
+          this.tags = all.filter((t) => !isChild(t)).concat(all.filter(isChild));
           this.loadingTags = false;
           m.redraw();
         })
@@ -58,7 +61,10 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
 
   contexts(): Ctx[] {
     const list: Ctx[] = [{ key: 'home', label: app.translator.trans('ernestdefoe-hero-builder.admin.studio.home') as any }];
-    this.tags.forEach((t) => list.push({ key: 'tag:' + t.id(), label: t.name(), tag: t }));
+    this.tags.forEach((t) => {
+      const parent = t.isChild && t.isChild() && t.parent && t.parent();
+      list.push({ key: 'tag:' + t.id(), label: parent ? parent.name() + ' › ' + t.name() : t.name(), tag: t });
+    });
     return list;
   }
 
@@ -106,6 +112,11 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       width: Number(e.width) || undefined,
       iconBg: e.iconBg !== false,
       sharpCorners: e.sharpCorners === true,
+      borderWidth: e.borderWidth != null ? Number(e.borderWidth) : undefined,
+      borderColor: e.borderColor || undefined,
+      shadow: (e.shadow as any) || undefined,
+      marginTop: e.marginTop != null ? Number(e.marginTop) : undefined,
+      marginBottom: e.marginBottom != null ? Number(e.marginBottom) : undefined,
     };
   }
 
@@ -148,23 +159,49 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
           this.num('width', t('width'), e.width, t('width_ph') as any),
         ]),
         this.toggle('sharpCorners', t('sharp_corners'), e.sharpCorners === true),
+        m('div.HeroStudio-row', [
+          this.num('borderWidth', t('border_width'), e.borderWidth, '1', t('border_width_help') as any),
+          this.color('borderColor', t('border_color'), e.borderColor, 'rgba(255,255,255,0.1)'),
+        ]),
+        this.select('shadow', t('shadow'), e.shadow, [
+          ['', t('shadow_default') as any],
+          ['none', t('shadow_none') as any],
+          ['soft', t('shadow_soft') as any],
+          ['medium', t('shadow_medium') as any],
+          ['strong', t('shadow_strong') as any],
+        ]),
+        m('div.HeroStudio-row', [
+          this.num('marginTop', t('margin_top'), e.marginTop, '0', t('margin_help') as any, -100),
+          this.num('marginBottom', t('margin_bottom'), e.marginBottom, '18', undefined, -100),
+        ]),
         this.toggle('showStats', t('show_stats'), e.showStats !== false),
         e.showStats !== false ? this.statsEditor() : null,
       ]),
     ]);
   }
 
-  num(field: keyof Entry, label: string, val: any, placeholder: any, help?: string) {
+  num(field: keyof Entry, label: string, val: any, placeholder: any, help?: string, min = 0) {
     return m('div.Form-group.HeroStudio-field', [
       m('label', label),
       m('input.FormControl', {
         type: 'number',
-        min: 0,
+        min,
         value: val ?? '',
         placeholder: placeholder || '',
         oninput: (ev: any) => this.set(field, ev.target.value === '' ? undefined : Number(ev.target.value)),
       }),
       help ? m('p.helpText', help) : null,
+    ]);
+  }
+
+  select(field: keyof Entry, label: string, val: any, opts: Array<[string, string]>) {
+    return m('div.Form-group.HeroStudio-field', [
+      m('label', label),
+      m(
+        'select.FormControl',
+        { value: val ?? '', onchange: (ev: any) => this.set(field, ev.target.value || undefined) },
+        opts.map(([v, l]) => m('option', { value: v, selected: (val ?? '') === v }, l))
+      ),
     ]);
   }
 

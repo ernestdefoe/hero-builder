@@ -18,7 +18,25 @@ export interface HeroCfg {
   iconBg?: boolean;
   /** Use square (sharp) corners instead of the default rounded ones. */
   sharpCorners?: boolean;
+  /** Border thickness in px (0 = no border). Unset → the CSS default. */
+  borderWidth?: number;
+  /** Border colour (any CSS colour). */
+  borderColor?: string;
+  /** Drop-shadow strength. Unset → the CSS default. */
+  shadow?: 'none' | 'soft' | 'medium' | 'strong';
+  /** Space above the banner in px (also lets you close/adjust the header gap). */
+  marginTop?: number;
+  /** Space below the banner in px (falls back to the CSS default when unset). */
+  marginBottom?: number;
 }
+
+/** Drop-shadow presets keyed by `HeroCfg.shadow`. */
+export const HERO_SHADOWS: Record<string, string> = {
+  none: 'none',
+  soft: '0 6px 20px -10px rgba(0, 0, 0, 0.35)',
+  medium: '0 16px 44px -16px rgba(0, 0, 0, 0.5)',
+  strong: '0 24px 64px -18px rgba(0, 0, 0, 0.66)',
+};
 
 /** The default look when nothing is configured. */
 export const HERO_DEFAULTS = { icon: 'fas fa-meteor', c1: '#7c3aed', c2: '#ec4899' };
@@ -59,6 +77,14 @@ export function heroView(cfg: HeroCfg) {
     style.marginLeft = 'auto';
     style.marginRight = 'auto';
   }
+  if (cfg.borderWidth != null) {
+    style.border = cfg.borderWidth > 0 ? `${cfg.borderWidth}px solid ${cfg.borderColor || 'rgba(255,255,255,0.1)'}` : 'none';
+  } else if (cfg.borderColor) {
+    style.borderColor = cfg.borderColor;
+  }
+  if (cfg.shadow && HERO_SHADOWS[cfg.shadow]) style.boxShadow = HERO_SHADOWS[cfg.shadow];
+  if (cfg.marginTop != null) style.marginTop = cfg.marginTop + 'px';
+  if (cfg.marginBottom != null) style.marginBottom = cfg.marginBottom + 'px';
 
   return m('div.HeroBanner', { className: cfg.sharpCorners ? 'HeroBanner--sharp' : '', style }, [
     cfg.image ? m('img.HeroBanner-cover', { src: cfg.image, alt: '' }) : null,

@@ -72,6 +72,11 @@ export function resolveHero(): HeroCfg | null {
     width: Number(override.width) || undefined,
     iconBg: override.iconBg !== false,
     sharpCorners: override.sharpCorners === true,
+    borderWidth: override.borderWidth != null ? Number(override.borderWidth) : undefined,
+    borderColor: override.borderColor || undefined,
+    shadow: override.shadow || undefined,
+    marginTop: override.marginTop != null ? Number(override.marginTop) : undefined,
+    marginBottom: override.marginBottom != null ? Number(override.marginBottom) : undefined,
   };
 }
 

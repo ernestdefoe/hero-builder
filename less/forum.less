@@ -30,10 +30,20 @@
 }
 .HeroBanner-body { position: relative; z-index: 1; display: flex; align-items: center; gap: 18px; padding: 24px 28px; }
 .HeroBanner-badge {
-  display: grid; place-items: center; flex: 0 0 auto; width: 60px; height: 60px;
-  border-radius: 18px; font-size: 26px; color: #fff;
-  background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+  display: grid; place-items: center; flex: 0 0 auto;
+  /* Fixed height, square minimum, but widens for wide wordmark logos (B1G, SEC)
+     so they sit as a centred lockup instead of overflowing a fixed square. */
+  height: 92px; min-width: 92px; width: auto; padding: 0 66px;
+  border-radius: 22px; font-size: 48px;
+  /* Solid white chip so the icon/logo shows in its own colour (set inline from
+     the hero's primary) rather than washing out as a white silhouette. */
+  background: #fff; color: #204805;
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+/* Flex-center the glyph so icon-font baseline metrics can't shove it off-centre
+   (applies to FA icons and fa-kit logos alike). */
+.HeroBanner-badge i {
+  display: flex; align-items: center; justify-content: center; line-height: 1;
 }
 /* Sharp-corner variant — square edges on the banner and its boxes. */
 .HeroBanner--sharp,

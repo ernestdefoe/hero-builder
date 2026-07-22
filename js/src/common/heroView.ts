@@ -41,6 +41,32 @@ export const HERO_SHADOWS: Record<string, string> = {
 /** The default look when nothing is configured. */
 export const HERO_DEFAULTS = { icon: 'fas fa-meteor', c1: '#7c3aed', c2: '#ec4899' };
 
+/** Parse #rgb / #rrggbb → [r, g, b] (0–255); null if unparseable. */
+function parseHex(hex: string): [number, number, number] | null {
+  let h = (hex || '').replace('#', '').trim();
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+  const n = parseInt(h, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/**
+ * The badge is a white chip, so the icon/logo shows in this colour. Team primary
+ * colours can be light (Iowa gold, Carolina blue) and would wash out on white, so
+ * darken just those enough to stay legible while keeping the hue. Dark colours pass
+ * through untouched.
+ */
+export function badgeIconColor(hex: string): string {
+  const rgb = parseHex(hex);
+  if (!rgb) return hex || '#204805';
+  const [r, g, b] = rgb;
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b; // 0–255
+  const MAX = 150;
+  if (lum <= MAX) return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
+  const f = MAX / lum;
+  return '#' + [r, g, b].map((c) => Math.round(c * f).toString(16).padStart(2, '0')).join('');
+}
+
 /** Compact a number: 1234 → "1.2k". */
 export function fmtCount(n?: number): string {
   const v = n ?? 0;
@@ -106,7 +132,14 @@ export function heroView(cfg: HeroCfg) {
     m('span.HeroBanner-wash', { 'aria-hidden': 'true' }),
     m('div.HeroBanner-body', [
       cfg.iconBg !== false
-        ? m('div.HeroBanner-badge', m('i', { className: cfg.icon || HERO_DEFAULTS.icon, 'aria-hidden': 'true' }))
+        ? m(
+            'div.HeroBanner-badge',
+            m('i', {
+              className: cfg.icon || HERO_DEFAULTS.icon,
+              style: { color: badgeIconColor(cfg.c1 || HERO_DEFAULTS.c1) },
+              'aria-hidden': 'true',
+            })
+          )
         : null,
       m('div.HeroBanner-text', [
         m('h1.HeroBanner-title', cfg.title),

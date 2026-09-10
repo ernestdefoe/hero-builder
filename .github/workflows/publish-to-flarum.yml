@@ -120,6 +120,11 @@ jobs:
         run: |
           set -euo pipefail
 
+          # 🚨 Skip, do not fail, when the announcement is not configured.
+          # A repository with no support discussion is a normal state — a new
+          # extension, a private one, one that simply is not announced. Exiting
+          # 1 painted a red X on every release of every such repo, which trains
+          # people to ignore the one failure that does matter.
           if [ -z "${FLARUM_FORUM_URL}" ] || [ -z "${FLARUM_DISCUSSION_ID}" ] || [ -z "${FLARUM_API_KEY}" ]; then
             echo "::notice::No support discussion configured for this repository — skipping the announcement. Set the FLARUM_FORUM_URL and FLARUM_DISCUSSION_ID variables and the FLARUM_API_KEY secret to enable it."
             exit 0

@@ -69,6 +69,11 @@
   .HeroBanner-title { font-size: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { .HeroBanner-blob, .HeroBanner-sheen { animation: none; } }
+/* "Still" background effects: the glow stays, the motion stops. The sheen goes
+   entirely — it only reads as light while it spins; frozen, its conic edge is a
+   hard-edged disc, which is the "round thingy" HERO-1 asked to be rid of. */
+.HeroBanner--still .HeroBanner-blob { animation: none; }
+.HeroBanner--still .HeroBanner-sheen { display: none; }
 
 /* ── Hero Studio (admin live editor) ───────────────────────────────── */
 .HeroStudio { margin-top: 8px; }

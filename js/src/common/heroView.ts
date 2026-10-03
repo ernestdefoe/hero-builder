@@ -22,6 +22,11 @@ export interface HeroCfg {
   borderWidth?: number;
   /** Border colour (any CSS colour). */
   borderColor?: string;
+  /**
+   * The drifting glow shapes and the slow sheen behind the text. Unset is
+   * 'animated'; 'still' keeps the look without the motion; 'off' removes them.
+   */
+  effects?: 'animated' | 'still' | 'off';
   /** Drop-shadow strength. Unset → the CSS default. */
   shadow?: 'none' | 'soft' | 'medium' | 'strong';
   /** Space above the banner in px (also lets you close/adjust the header gap). */
@@ -112,13 +117,16 @@ export function heroView(cfg: HeroCfg) {
   if (cfg.marginTop != null) style.marginTop = cfg.marginTop + 'px';
   if (cfg.marginBottom != null) style.marginBottom = cfg.marginBottom + 'px';
 
-  return m('div.HeroBanner', { className: cfg.sharpCorners ? 'HeroBanner--sharp' : '', style }, [
+  const effects = cfg.effects || 'animated';
+  const classes = [cfg.sharpCorners ? 'HeroBanner--sharp' : '', effects === 'still' ? 'HeroBanner--still' : ''].filter(Boolean).join(' ');
+
+  return m('div.HeroBanner', { className: classes, style }, [
     cfg.image ? m('img.HeroBanner-cover', { src: cfg.image, alt: '' }) : null,
-    m('span.HeroBanner-blob', {
+    effects === 'off' ? null : m('span.HeroBanner-blob', {
       style: { background: `radial-gradient(circle, ${cfg.c1}, transparent 70%)`, left: '-50px', top: '-80px' },
       'aria-hidden': 'true',
     }),
-    m('span.HeroBanner-blob', {
+    effects === 'off' ? null : m('span.HeroBanner-blob', {
       style: {
         background: `radial-gradient(circle, ${cfg.c2}, transparent 70%)`,
         right: '-40px',
@@ -128,7 +136,7 @@ export function heroView(cfg: HeroCfg) {
       },
       'aria-hidden': 'true',
     }),
-    m('span.HeroBanner-sheen', { 'aria-hidden': 'true' }),
+    effects === 'off' ? null : m('span.HeroBanner-sheen', { 'aria-hidden': 'true' }),
     m('span.HeroBanner-wash', { 'aria-hidden': 'true' }),
     m('div.HeroBanner-body', [
       cfg.iconBg !== false

@@ -74,6 +74,7 @@ export function resolveHero(): HeroCfg | null {
     sharpCorners: override.sharpCorners === true,
     borderWidth: override.borderWidth != null ? Number(override.borderWidth) : undefined,
     borderColor: override.borderColor || undefined,
+    effects: override.effects || undefined,
     shadow: override.shadow || undefined,
     marginTop: override.marginTop != null ? Number(override.marginTop) : undefined,
     marginBottom: override.marginBottom != null ? Number(override.marginBottom) : undefined,

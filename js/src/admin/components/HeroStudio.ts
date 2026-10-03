@@ -6,7 +6,7 @@ declare const m: import('mithril').Static;
 
 type Ctx = { key: string; label: string; tag?: any };
 type Stat = { value?: string; icon?: string; label?: string };
-type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; stats?: Stat[]; height?: number; width?: number; iconBg?: boolean; sharpCorners?: boolean; borderWidth?: number; borderColor?: string; shadow?: string; marginTop?: number; marginBottom?: number };
+type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; stats?: Stat[]; height?: number; width?: number; iconBg?: boolean; sharpCorners?: boolean; effects?: string; borderWidth?: number; borderColor?: string; shadow?: string; marginTop?: number; marginBottom?: number };
 
 /** Custom stats → renderable form (drops blank rows, fills an icon default). */
 function cleanStats(stats?: Stat[]) {
@@ -114,6 +114,7 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       sharpCorners: e.sharpCorners === true,
       borderWidth: e.borderWidth != null ? Number(e.borderWidth) : undefined,
       borderColor: e.borderColor || undefined,
+      effects: (e.effects as any) || undefined,
       shadow: (e.shadow as any) || undefined,
       marginTop: e.marginTop != null ? Number(e.marginTop) : undefined,
       marginBottom: e.marginBottom != null ? Number(e.marginBottom) : undefined,
@@ -162,6 +163,11 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
         m('div.HeroStudio-row', [
           this.num('borderWidth', t('border_width'), e.borderWidth, '1', t('border_width_help') as any),
           this.color('borderColor', t('border_color'), e.borderColor, 'rgba(255,255,255,0.1)'),
+        ]),
+        this.select('effects', t('effects'), e.effects, [
+          ['', t('effects_animated') as any],
+          ['still', t('effects_still') as any],
+          ['off', t('effects_off') as any],
         ]),
         this.select('shadow', t('shadow'), e.shadow, [
           ['', t('shadow_default') as any],

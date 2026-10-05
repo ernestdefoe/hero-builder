@@ -64,7 +64,9 @@ function parseHex(hex: string): [number, number, number] | null {
 export function badgeIconColor(hex: string): string {
   const rgb = parseHex(hex);
   if (!rgb) return hex || '#204805';
-  const [r, g, b] = rgb;
+  // Indexed, not destructured: destructuring pulls ~1.5 KB of Babel helpers
+  // into every page's bundle.
+  const r = rgb[0], g = rgb[1], b = rgb[2];
   const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b; // 0–255
   const MAX = 150;
   if (lum <= MAX) return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');

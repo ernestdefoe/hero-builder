@@ -58,6 +58,10 @@ npm run build
 
 ---
 
+## Discuss
+
+Questions, ideas and release notes: [Hero Builder on discuss.flarum.org](https://discuss.flarum.org/d/39479-hero-builder-built-with-ai).
+
 ## License
 
 [MIT](LICENSE) © Ernest Defoe. Free to use, fork and build on.

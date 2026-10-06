@@ -58,9 +58,11 @@ npm run build
 
 ---
 
-## Discuss
+## Support
 
-Questions, ideas and release notes: [Hero Builder on discuss.flarum.org](https://discuss.flarum.org/d/39479-hero-builder-built-with-ai).
+- **Support forum:** [Hero Builder on ernestdefoe.online](https://ernestdefoe.online/d/69)
+- **Flarum community:** [Hero Builder on discuss.flarum.org](https://discuss.flarum.org/d/39479-hero-builder-built-with-ai)
+- **Bug reports:** [GitHub issues](https://github.com/ernestdefoe/hero-builder/issues)
 
 ## License
 

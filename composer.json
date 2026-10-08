@@ -1,7 +1,14 @@
 {
   "name": "ernestdefoe/hero-builder",
   "description": "A fully customizable, animated hero banner for your Flarum discussion list — set the title, subtitle, any Font Awesome icon, a colour palette or a cover image, and live community stats. A polished, modern welcome.",
-  "keywords": ["flarum", "flarum-extension", "hero", "banner", "welcome", "customization"],
+  "keywords": [
+    "flarum",
+    "flarum-extension",
+    "hero",
+    "banner",
+    "welcome",
+    "customization"
+  ],
   "type": "flarum-extension",
   "license": "MIT",
   "authors": [
@@ -20,6 +27,15 @@
     "php": "^8.3",
     "flarum/core": "^2.0"
   },
+  "require-dev": {
+    "flarum/phpstan": "^2.0",
+    "flarum/testing": "^2.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ErnestDefoe\\HeroBuilder\\Tests\\": "tests/"
+    }
+  },
   "extra": {
     "flarum-extension": {
       "title": "Hero Builder",
@@ -37,6 +53,20 @@
         "locale": true
       }
     }
+  },
+  "scripts": {
+    "test": [
+      "@test:integration"
+    ],
+    "test:integration": "phpunit -c tests/phpunit.integration.xml",
+    "test:setup": "@php tests/integration/setup.php",
+    "analyse:phpstan": "phpstan analyse"
+  },
+  "scripts-descriptions": {
+    "test": "Runs all tests.",
+    "test:integration": "Runs all integration tests.",
+    "test:setup": "Sets up a database for use with integration tests. Execute this only once.",
+    "analyse:phpstan": "Run static analysis"
   },
   "minimum-stability": "beta",
   "prefer-stable": true

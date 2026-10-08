@@ -1,12 +1,33 @@
 import app from 'flarum/admin/app';
 import Component from 'flarum/common/Component';
+import extractText from 'flarum/common/utils/extractText';
 import { heroView, HeroCfg, HERO_DEFAULTS, forumStats } from '../../common/heroView';
 
 declare const m: import('mithril').Static;
 
 type Ctx = { key: string; label: string; tag?: any };
 type Stat = { value?: string; icon?: string; label?: string };
-type Entry = { enabled?: boolean; title?: string; subtitle?: string; icon?: string; c1?: string; c2?: string; image?: string; showStats?: boolean; stats?: Stat[]; height?: number; width?: number; iconBg?: boolean; sharpCorners?: boolean; effects?: string; borderWidth?: number; borderColor?: string; shadow?: string; marginTop?: number; marginBottom?: number };
+type Entry = {
+  enabled?: boolean;
+  title?: string;
+  subtitle?: string;
+  icon?: string;
+  c1?: string;
+  c2?: string;
+  image?: string;
+  showStats?: boolean;
+  stats?: Stat[];
+  height?: number;
+  width?: number;
+  iconBg?: boolean;
+  sharpCorners?: boolean;
+  effects?: string;
+  borderWidth?: number;
+  borderColor?: string;
+  shadow?: string;
+  marginTop?: number;
+  marginBottom?: number;
+};
 
 /** Custom stats → renderable form (drops blank rows, fills an icon default). */
 function cleanStats(stats?: Stat[]) {
@@ -102,7 +123,13 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
           : cleanStats(e.stats).length
             ? cleanStats(e.stats)
             : tag
-              ? [{ value: String(tag.discussionCount?.() ?? 0), icon: 'fas fa-comments', label: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any }]
+              ? [
+                  {
+                    value: String(tag.discussionCount?.() ?? 0),
+                    icon: 'fas fa-comments',
+                    label: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any,
+                  },
+                ]
               : forumStats(app.forum?.attribute?.('heroBuilderStats') as any, {
                   discussions: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any,
                   posts: app.translator.trans('ernestdefoe-hero-builder.forum.posts') as any,
@@ -122,7 +149,7 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
   }
 
   view() {
-    const t = (k: string) => app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`);
+    const t = (k: string) => extractText(app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`));
     const e = this.entry();
     const off = e.enabled === false;
 
@@ -237,28 +264,43 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
 
   toggle(field: keyof Entry, label: string, on: boolean) {
     return m('div.Form-group.HeroStudio-field.HeroStudio-toggle', [
-      m('label', [
-        m('input', { type: 'checkbox', checked: on, onchange: (ev: any) => this.set(field, ev.target.checked) }),
-        ' ',
-        label,
-      ]),
+      m('label', [m('input', { type: 'checkbox', checked: on, onchange: (ev: any) => this.set(field, ev.target.checked) }), ' ', label]),
     ]);
   }
 
   /** Repeatable custom-stat editor (value / FA icon / label). Lets ANY hero —
    *  including the home page, which has no auto stat — show stats in the header. */
   statsEditor() {
-    const t = (k: string) => app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`);
+    const t = (k: string) => extractText(app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`));
     const rows: Stat[] = Array.isArray(this.entry().stats) ? (this.entry().stats as Stat[]) : [];
     return m('div.Form-group.HeroStudio-field.HeroStudio-stats', [
       m('label', t('stats_custom')),
       m('p.helpText', t('stats_custom_help')),
       rows.map((s, i) =>
         m('div.HeroStudio-statRow', [
-          m('input.FormControl', { type: 'text', placeholder: t('stat_value'), value: s.value || '', oninput: (ev: any) => this.setStat(i, 'value', ev.target.value) }),
-          m('input.FormControl', { type: 'text', placeholder: t('stat_icon'), value: s.icon || '', oninput: (ev: any) => this.setStat(i, 'icon', ev.target.value) }),
-          m('input.FormControl', { type: 'text', placeholder: t('stat_label'), value: s.label || '', oninput: (ev: any) => this.setStat(i, 'label', ev.target.value) }),
-          m('button.Button.Button--icon.HeroStudio-statDel', { type: 'button', title: t('stat_remove'), onclick: () => this.removeStat(i) }, m('i.fas.fa-times')),
+          m('input.FormControl', {
+            type: 'text',
+            placeholder: t('stat_value'),
+            value: s.value || '',
+            oninput: (ev: any) => this.setStat(i, 'value', ev.target.value),
+          }),
+          m('input.FormControl', {
+            type: 'text',
+            placeholder: t('stat_icon'),
+            value: s.icon || '',
+            oninput: (ev: any) => this.setStat(i, 'icon', ev.target.value),
+          }),
+          m('input.FormControl', {
+            type: 'text',
+            placeholder: t('stat_label'),
+            value: s.label || '',
+            oninput: (ev: any) => this.setStat(i, 'label', ev.target.value),
+          }),
+          m(
+            'button.Button.Button--icon.HeroStudio-statDel',
+            { type: 'button', title: t('stat_remove'), onclick: () => this.removeStat(i) },
+            m('i.fas.fa-times')
+          ),
         ])
       ),
       m('button.Button.Button--text.HeroStudio-statAdd', { type: 'button', onclick: () => this.addStat() }, [m('i.fas.fa-plus'), ' ', t('stat_add')]),
@@ -276,6 +318,9 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
   }
 
   removeStat(i: number) {
-    this.set('stats', (this.entry().stats || []).filter((_: Stat, j: number) => j !== i));
+    this.set(
+      'stats',
+      (this.entry().stats || []).filter((_: Stat, j: number) => j !== i)
+    );
   }
 }

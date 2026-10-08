@@ -28,7 +28,7 @@ export function resolveHero(): HeroCfg | null {
     base = {
       title: tag.name(),
       subtitle: tag.attribute('description') || '',
-      icon: tag.attribute<string>('icon') || HERO_DEFAULTS.icon,
+      icon: tag.attribute('icon') || HERO_DEFAULTS.icon,
       c1: tag.color() || HERO_DEFAULTS.c1,
       c2: HERO_DEFAULTS.c2,
     };

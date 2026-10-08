@@ -49,7 +49,11 @@ export const HERO_DEFAULTS = { icon: 'fas fa-meteor', c1: '#7c3aed', c2: '#ec489
 /** Parse #rgb / #rrggbb → [r, g, b] (0–255); null if unparseable. */
 function parseHex(hex: string): [number, number, number] | null {
   let h = (hex || '').replace('#', '').trim();
-  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  if (h.length === 3)
+    h = h
+      .split('')
+      .map((c) => c + c)
+      .join('');
   if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
   const n = parseInt(h, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
@@ -66,12 +70,23 @@ export function badgeIconColor(hex: string): string {
   if (!rgb) return hex || '#204805';
   // Indexed, not destructured: destructuring pulls ~1.5 KB of Babel helpers
   // into every page's bundle.
-  const r = rgb[0], g = rgb[1], b = rgb[2];
+  const r = rgb[0],
+    g = rgb[1],
+    b = rgb[2];
   const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b; // 0–255
   const MAX = 150;
   if (lum <= MAX) return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
   const f = MAX / lum;
-  return '#' + [r, g, b].map((c) => Math.round(c * f).toString(16).padStart(2, '0')).join('');
+  return (
+    '#' +
+    [r, g, b]
+      .map((c) =>
+        Math.round(c * f)
+          .toString(16)
+          .padStart(2, '0')
+      )
+      .join('')
+  );
 }
 
 /** Compact a number: 1234 → "1.2k". */
@@ -124,20 +139,24 @@ export function heroView(cfg: HeroCfg) {
 
   return m('div.HeroBanner', { className: classes, style }, [
     cfg.image ? m('img.HeroBanner-cover', { src: cfg.image, alt: '' }) : null,
-    effects === 'off' ? null : m('span.HeroBanner-blob', {
-      style: { background: `radial-gradient(circle, ${cfg.c1}, transparent 70%)`, left: '-50px', top: '-80px' },
-      'aria-hidden': 'true',
-    }),
-    effects === 'off' ? null : m('span.HeroBanner-blob', {
-      style: {
-        background: `radial-gradient(circle, ${cfg.c2}, transparent 70%)`,
-        right: '-40px',
-        top: '-50px',
-        animationDuration: '11s',
-        animationDelay: '-3s',
-      },
-      'aria-hidden': 'true',
-    }),
+    effects === 'off'
+      ? null
+      : m('span.HeroBanner-blob', {
+          style: { background: `radial-gradient(circle, ${cfg.c1}, transparent 70%)`, left: '-50px', top: '-80px' },
+          'aria-hidden': 'true',
+        }),
+    effects === 'off'
+      ? null
+      : m('span.HeroBanner-blob', {
+          style: {
+            background: `radial-gradient(circle, ${cfg.c2}, transparent 70%)`,
+            right: '-40px',
+            top: '-50px',
+            animationDuration: '11s',
+            animationDelay: '-3s',
+          },
+          'aria-hidden': 'true',
+        }),
     effects === 'off' ? null : m('span.HeroBanner-sheen', { 'aria-hidden': 'true' }),
     m('span.HeroBanner-wash', { 'aria-hidden': 'true' }),
     m('div.HeroBanner-body', [
@@ -151,10 +170,7 @@ export function heroView(cfg: HeroCfg) {
             })
           )
         : null,
-      m('div.HeroBanner-text', [
-        m('h1.HeroBanner-title', cfg.title),
-        cfg.subtitle ? m('p.HeroBanner-subtitle', cfg.subtitle) : null,
-      ]),
+      m('div.HeroBanner-text', [m('h1.HeroBanner-title', cfg.title), cfg.subtitle ? m('p.HeroBanner-subtitle', cfg.subtitle) : null]),
       cfg.showStats !== false && cfg.stats && cfg.stats.length
         ? m(
             'div.HeroBanner-stats',

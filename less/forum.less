@@ -65,6 +65,11 @@
 @keyframes heroSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 @media (max-width: 767px) {
   .HeroBanner-body { flex-wrap: wrap; }
+  /* The desktop badge (92px tall, 66px of side padding) took half a phone's
+     width and squeezed the title into a one-word column. Smaller on phones,
+     and the text drops under it rather than going narrower than 160px. */
+  .HeroBanner-badge { height: 60px; min-width: 60px; padding: 0 18px; border-radius: 16px; font-size: 30px; }
+  .HeroBanner-text { flex: 1 1 160px; }
   .HeroBanner-stats { width: 100%; }
   .HeroBanner-title { font-size: 24px; }
 }

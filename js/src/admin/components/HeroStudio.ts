@@ -108,6 +108,7 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
     const baseTitle = tag ? tag.name() : (app.forum?.attribute?.('title') as string) || 'Your community';
     const baseIcon = tag?.attribute?.('icon') || HERO_DEFAULTS.icon;
     const baseC1 = tag?.color?.() || HERO_DEFAULTS.c1;
+    const typed = cleanStats(e.stats);
 
     return {
       title: e.title || baseTitle,
@@ -120,8 +121,8 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       stats:
         e.showStats === false
           ? []
-          : cleanStats(e.stats).length
-            ? cleanStats(e.stats)
+          : typed.length
+            ? typed
             : tag
               ? [
                   {

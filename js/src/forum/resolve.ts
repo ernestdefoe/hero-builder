@@ -1,5 +1,5 @@
 import app from 'flarum/forum/app';
-import { HeroCfg, HERO_DEFAULTS, forumStats } from '../common/heroView';
+import { HeroCfg, HERO_DEFAULTS, forumStats, fmtCount } from '../common/heroView';
 
 declare const m: import('mithril').Static;
 
@@ -34,7 +34,7 @@ export function resolveHero(): HeroCfg | null {
     };
     const count = tag.discussionCount?.();
     if (typeof count === 'number') {
-      stats = [{ value: fmt(count), icon: 'fas fa-comments', label: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any }];
+      stats = [{ value: fmtCount(count), icon: 'fas fa-comments', label: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any }];
     }
   } else {
     base = {
@@ -87,8 +87,4 @@ function currentTag(): any | null {
   if (!param || !(app.store as any)?.all) return null;
   const slug = String(param).split('/').pop();
   return app.store.all('tags').find((t: any) => t.slug && t.slug() === slug) || null;
-}
-
-function fmt(n: number): string {
-  return n >= 1000 ? Math.round(n / 100) / 10 + 'k' : String(n);
 }

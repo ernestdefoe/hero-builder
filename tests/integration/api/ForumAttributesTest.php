@@ -5,6 +5,7 @@ namespace ErnestDefoe\HeroBuilder\Tests\integration\api;
 use Carbon\Carbon;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
+use Flarum\Tags\Tag;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
 use Flarum\User\User;
@@ -21,9 +22,9 @@ class ForumAttributesTest extends TestCase
         $this->extension('ernestdefoe-hero-builder');
     }
 
-    private function forum(): array
+    private function forum(?int $actorId = null): array
     {
-        $response = $this->send($this->request('GET', '/api'));
+        $response = $this->send($this->request('GET', '/api', $actorId ? ['authenticatedAs' => $actorId] : []));
         $this->assertSame(200, $response->getStatusCode());
 
         return json_decode((string) $response->getBody(), true)['data']['attributes'];
@@ -72,5 +73,40 @@ class ForumAttributesTest extends TestCase
         $this->assertSame(1, $stats['discussions'], 'Private and hidden discussions are not counted');
         $this->assertSame(1, $stats['posts'], 'Hidden posts and event posts are not counted');
         $this->assertSame(2, $stats['users']);
+    }
+
+    #[Test]
+    public function a_restricted_tags_hero_is_only_sent_to_those_who_can_see_the_tag()
+    {
+        $this->extension('flarum-tags', 'ernestdefoe-hero-builder');
+        $this->prepareDatabase([
+            User::class => [$this->normalUser()],
+            Tag::class => [
+                ['id' => 1, 'name' => 'Open', 'slug' => 'open', 'position' => 0],
+                ['id' => 2, 'name' => 'Staff', 'slug' => 'staff', 'position' => 1, 'is_restricted' => true],
+            ],
+        ]);
+        $this->setting('ernestdefoe-hero-builder.heroes', json_encode([
+            'home' => ['title' => 'Welcome'],
+            'tag:1' => ['title' => 'Open hero'],
+            'tag:2' => ['title' => 'Staff only', 'image' => 'https://example.com/secret.jpg'],
+        ]));
+
+        $guest = $this->forum()['heroBuilder.heroes'];
+        $this->assertSame(['home', 'tag:1'], array_keys($guest));
+
+        $member = $this->forum(2)['heroBuilder.heroes'];
+        $this->assertSame(['home', 'tag:1'], array_keys($member));
+
+        $admin = $this->forum(1)['heroBuilder.heroes'];
+        $this->assertSame(['home', 'tag:1', 'tag:2'], array_keys($admin));
+    }
+
+    #[Test]
+    public function tag_heroes_are_dropped_when_tags_is_off()
+    {
+        $this->setting('ernestdefoe-hero-builder.heroes', json_encode(['home' => ['title' => 'Hi'], 'tag:1' => ['title' => 'T']]));
+
+        $this->assertSame(['home'], array_keys($this->forum()['heroBuilder.heroes']));
     }
 }

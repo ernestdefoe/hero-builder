@@ -25,6 +25,12 @@ class SubtitleHtml
     /** Tags whose content is code, not text: dropped whole. */
     private const DROP = ['script', 'style', 'template', 'noscript', 'iframe', 'object', 'textarea', 'title', 'svg', 'math'];
 
+    /** Has a tag in it ("<p", "</", "<!--"), not just a "<" like "<3" or "a < b". */
+    public static function looksLikeHtml(string $text): bool
+    {
+        return (bool) preg_match('~<[a-z/!]~i', $text);
+    }
+
     public static function clean(string $html): string
     {
         $doc = new DOMDocument();

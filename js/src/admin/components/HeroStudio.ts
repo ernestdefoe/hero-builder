@@ -110,7 +110,8 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
     const baseIcon = tag?.attribute?.('icon') || HERO_DEFAULTS.icon;
     const baseC1 = tag?.color?.() || HERO_DEFAULTS.c1;
     const typed = cleanStats(e.stats);
-    const html = typeof e.subtitle === 'string' && e.subtitle.includes('<');
+    // Same test as SubtitleHtml::looksLikeHtml(): a tag, not just "<3".
+    const html = typeof e.subtitle === 'string' && /<[a-z/!]/i.test(e.subtitle);
 
     return {
       title: e.title || baseTitle,

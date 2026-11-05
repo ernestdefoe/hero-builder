@@ -63,7 +63,7 @@ class ForumHeroFields
         // A subtitle with HTML in it is sent cleaned, as subtitleHtml, and the
         // raw text is never sent. Plain text stays as it is.
         foreach ($heroes as &$hero) {
-            if (is_array($hero) && is_string($hero['subtitle'] ?? null) && str_contains($hero['subtitle'], '<')) {
+            if (is_array($hero) && is_string($hero['subtitle'] ?? null) && SubtitleHtml::looksLikeHtml($hero['subtitle'])) {
                 $hero['subtitleHtml'] = SubtitleHtml::clean($hero['subtitle']);
                 unset($hero['subtitle']);
             }

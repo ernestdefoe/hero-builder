@@ -115,12 +115,12 @@ class ForumAttributesTest extends TestCase
     {
         $this->setting('ernestdefoe-hero-builder.heroes', json_encode([
             'home' => ['subtitle' => '<p>Hi <a href="javascript:alert(1)" onclick="x">there</a></p><script>alert(1)</script>'],
-            'plain' => ['subtitle' => 'Tips &amp; tricks, 100% plain'],
+            'plain' => ['subtitle' => 'Tips &amp; tricks <3, 1 < 2'],
         ]));
 
         $heroes = $this->forum()['heroBuilder.heroes'];
 
         $this->assertSame(['subtitleHtml' => '<p>Hi there</p>'], $heroes['home'], 'The raw subtitle is never sent');
-        $this->assertSame(['subtitle' => 'Tips &amp; tricks, 100% plain'], $heroes['plain']);
+        $this->assertSame(['subtitle' => 'Tips &amp; tricks <3, 1 < 2'], $heroes['plain'], 'A "<" that is not a tag stays plain text');
     }
 }

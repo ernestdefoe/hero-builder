@@ -56,7 +56,9 @@
   p { margin: 0; }
   p + p { margin-top: 6px; }
   strong, em { color: inherit; }
-  a, a:hover, a:focus { color: #fff; text-decoration: underline; }
+  /* Specific enough to beat themes that recolour every link, e.g.
+     :root:not([data-theme^="dark"]) a:not(.Button) — the banner is always dark. */
+  a[href]:not(.Button), a[href]:not(.Button):hover, a[href]:not(.Button):focus { color: #fff; text-decoration: underline; }
 }
 .HeroBanner-stats { display: flex; gap: 10px; flex: 0 0 auto; }
 .HeroBanner-stat {

@@ -48,5 +48,6 @@ function walk(node: Node): string {
  * inert document: nothing in it runs or loads.
  */
 export default function cleanSubtitle(html: string): string {
-  return walk(new DOMParser().parseFromString(html, 'text/html').body).trim();
+  // NUL bytes are dropped first, as on the server.
+  return walk(new DOMParser().parseFromString(html.replace(/\0/g, ''), 'text/html').body).trim();
 }

@@ -35,6 +35,8 @@ class SubtitleHtml
     {
         $doc = new DOMDocument();
         $previous = libxml_use_internal_errors(true);
+        // libxml stops reading at a NUL byte on some builds, dropping the rest.
+        $html = str_replace("\0", '', $html);
         $doc->loadHTML('<?xml encoding="UTF-8"><body>'.$html.'</body>', LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);
         libxml_clear_errors();
         libxml_use_internal_errors($previous);

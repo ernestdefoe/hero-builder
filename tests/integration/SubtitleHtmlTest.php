@@ -29,6 +29,7 @@ class SubtitleHtmlTest extends TestCase
             'entity-encoded tab' => ['<a href="java&#x09;script:alert(1)">x</a>', 'x'],
             'entity-encoded scheme' => ['<a href="&#106;avascript:alert(1)">x</a>', 'x'],
             'null byte' => ["<a href=\"java\0script:alert(1)\">x</a>", 'x'],
+            'null byte in text keeps what follows' => ["<p>a\0b</p><p>c</p>", '<p>ab</p><p>c</p>'],
             'leading control char' => ["<a href=\"\x01javascript:alert(1)\">x</a>", 'x'],
             'control char inside https is stripped' => ["<a href=\"ht\ttps://e.com\">x</a>", '<a href="https://e.com" rel="nofollow noopener">x</a>'],
             'data: link' => ['<a href="data:text/html,<script>alert(1)</script>">x</a>', 'x'],

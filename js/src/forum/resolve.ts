@@ -61,7 +61,9 @@ export function resolveHero(): HeroCfg | null {
 
   return {
     title: override.title || base.title || '',
-    subtitle: override.subtitle ?? base.subtitle,
+    // The server sends a subtitle with HTML in it as cleaned subtitleHtml instead.
+    subtitle: override.subtitleHtml != null ? undefined : (override.subtitle ?? base.subtitle),
+    subtitleHtml: override.subtitleHtml || undefined,
     icon: override.icon || base.icon || HERO_DEFAULTS.icon,
     c1: override.c1 || base.c1 || HERO_DEFAULTS.c1,
     c2: override.c2 || base.c2 || HERO_DEFAULTS.c2,

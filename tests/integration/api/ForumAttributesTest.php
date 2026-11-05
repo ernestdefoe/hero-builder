@@ -109,4 +109,18 @@ class ForumAttributesTest extends TestCase
 
         $this->assertSame(['home'], array_keys($this->forum()['heroBuilder.heroes']));
     }
+
+    #[Test]
+    public function a_subtitle_with_html_is_sent_cleaned_and_plain_text_is_untouched()
+    {
+        $this->setting('ernestdefoe-hero-builder.heroes', json_encode([
+            'home' => ['subtitle' => '<p>Hi <a href="javascript:alert(1)" onclick="x">there</a></p><script>alert(1)</script>'],
+            'plain' => ['subtitle' => 'Tips &amp; tricks, 100% plain'],
+        ]));
+
+        $heroes = $this->forum()['heroBuilder.heroes'];
+
+        $this->assertSame(['subtitleHtml' => '<p>Hi there</p>'], $heroes['home'], 'The raw subtitle is never sent');
+        $this->assertSame(['subtitle' => 'Tips &amp; tricks, 100% plain'], $heroes['plain']);
+    }
 }

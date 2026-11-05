@@ -2,6 +2,7 @@ import app from 'flarum/admin/app';
 import Component from 'flarum/common/Component';
 import extractText from 'flarum/common/utils/extractText';
 import { heroView, HeroCfg, HERO_DEFAULTS, forumStats } from '../../common/heroView';
+import cleanSubtitle from '../cleanSubtitle';
 
 declare const m: import('mithril').Static;
 
@@ -109,10 +110,12 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
     const baseIcon = tag?.attribute?.('icon') || HERO_DEFAULTS.icon;
     const baseC1 = tag?.color?.() || HERO_DEFAULTS.c1;
     const typed = cleanStats(e.stats);
+    const html = typeof e.subtitle === 'string' && e.subtitle.includes('<');
 
     return {
       title: e.title || baseTitle,
-      subtitle: e.subtitle ?? (tag?.attribute?.('description') || ''),
+      subtitle: html ? undefined : (e.subtitle ?? (tag?.attribute?.('description') || '')),
+      subtitleHtml: html ? cleanSubtitle(e.subtitle as string) : undefined,
       icon: e.icon || baseIcon,
       c1: e.c1 || baseC1,
       c2: e.c2 || HERO_DEFAULTS.c2,
@@ -178,7 +181,7 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       m('div.HeroStudio-fields', [
         this.toggle('enabled', t('show_hero'), e.enabled !== false),
         this.text('title', t('title'), e.title, this.preview().title),
-        this.text('subtitle', t('subtitle'), e.subtitle, ''),
+        this.textarea('subtitle', t('subtitle'), e.subtitle, t('subtitle_help') as any),
         this.text('icon', t('icon'), e.icon, this.preview().icon, t('icon_help') as any),
         this.toggle('iconBg', t('icon_bg'), e.iconBg !== false),
         m('div.HeroStudio-row', [this.color('c1', t('c1'), e.c1, this.preview().c1), this.color('c2', t('c2'), e.c2, this.preview().c2)]),
@@ -248,6 +251,14 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
         placeholder: placeholder || '',
         oninput: (ev: any) => this.set(field, ev.target.value),
       }),
+      help ? m('p.helpText', help) : null,
+    ]);
+  }
+
+  textarea(field: keyof Entry, label: string, val: any, help?: string) {
+    return m('div.Form-group.HeroStudio-field', [
+      m('label', label),
+      m('textarea.FormControl', { rows: 3, value: val || '', oninput: (ev: any) => this.set(field, ev.target.value) }),
       help ? m('p.helpText', help) : null,
     ]);
   }

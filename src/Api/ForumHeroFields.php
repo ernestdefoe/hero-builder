@@ -7,6 +7,7 @@
 
 namespace ErnestDefoe\HeroBuilder\Api;
 
+use ErnestDefoe\HeroBuilder\SubtitleHtml;
 use Flarum\Api\Context;
 use Flarum\Api\Schema\Attribute;
 use Flarum\Discussion\Discussion;
@@ -58,6 +59,16 @@ class ForumHeroFields
         if (! is_array($heroes)) {
             return [];
         }
+
+        // A subtitle with HTML in it is sent cleaned, as subtitleHtml, and the
+        // raw text is never sent. Plain text stays as it is.
+        foreach ($heroes as &$hero) {
+            if (is_array($hero) && is_string($hero['subtitle'] ?? null) && str_contains($hero['subtitle'], '<')) {
+                $hero['subtitleHtml'] = SubtitleHtml::clean($hero['subtitle']);
+                unset($hero['subtitle']);
+            }
+        }
+        unset($hero);
 
         $tagIds = [];
         foreach (array_keys($heroes) as $key) {

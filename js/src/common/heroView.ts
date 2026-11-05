@@ -4,6 +4,8 @@ declare const m: import('mithril').Static;
 export interface HeroCfg {
   title: string;
   subtitle?: string;
+  /** Subtitle HTML, already cleaned by the server's allow-list. Wins over `subtitle`. */
+  subtitleHtml?: string;
   icon: string;
   c1: string;
   c2: string;
@@ -170,7 +172,14 @@ export function heroView(cfg: HeroCfg) {
             })
           )
         : null,
-      m('div.HeroBanner-text', [m('h1.HeroBanner-title', cfg.title), cfg.subtitle ? m('p.HeroBanner-subtitle', cfg.subtitle) : null]),
+      m('div.HeroBanner-text', [
+        m('h1.HeroBanner-title', cfg.title),
+        cfg.subtitleHtml
+          ? m('div.HeroBanner-subtitle.HeroBanner-subtitle--html', m.trust(cfg.subtitleHtml))
+          : cfg.subtitle
+            ? m('p.HeroBanner-subtitle', cfg.subtitle)
+            : null,
+      ]),
       cfg.showStats !== false && cfg.stats && cfg.stats.length
         ? m(
             'div.HeroBanner-stats',

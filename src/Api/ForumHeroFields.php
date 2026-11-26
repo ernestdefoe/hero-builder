@@ -41,12 +41,13 @@ class ForumHeroFields
                 ->get(fn ($forum, Context $context) => $this->heroesFor($context) ?: (object) []),
 
             // Live forum counts for the home hero's "real" stats (vs typed ones).
-            // Cached 10 min so it's never a per-request COUNT query.
+            // Cached 10 min so it's never a per-request COUNT query. Members are
+            // those who confirmed their email (the key changed with that rule).
             Attribute::make('heroBuilderStats')
-                ->get(fn () => $this->cache->remember('hero-builder.stats', 600, fn () => [
+                ->get(fn () => $this->cache->remember('hero-builder.stats.v2', 600, fn () => [
                     'discussions' => Discussion::query()->where('is_private', false)->whereNull('hidden_at')->count(),
                     'posts' => Post::query()->where('type', 'comment')->whereNull('hidden_at')->count(),
-                    'users' => User::query()->count(),
+                    'users' => User::query()->where('is_email_confirmed', true)->count(),
                 ])),
         ];
     }

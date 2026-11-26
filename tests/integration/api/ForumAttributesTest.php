@@ -55,7 +55,10 @@ class ForumAttributesTest extends TestCase
     public function the_stats_count_only_public_visible_content()
     {
         $this->prepareDatabase([
-            User::class => [$this->normalUser()],
+            User::class => [
+                $this->normalUser(),
+                ['id' => 3, 'username' => 'unconfirmed', 'email' => 'unconfirmed@machine.local', 'is_email_confirmed' => 0],
+            ],
             Discussion::class => [
                 ['id' => 1, 'title' => 'Public', 'created_at' => Carbon::now(), 'user_id' => 2, 'first_post_id' => 1, 'comment_count' => 2],
                 ['id' => 2, 'title' => 'Private', 'created_at' => Carbon::now(), 'user_id' => 2, 'comment_count' => 0, 'is_private' => true],
@@ -72,7 +75,7 @@ class ForumAttributesTest extends TestCase
 
         $this->assertSame(1, $stats['discussions'], 'Private and hidden discussions are not counted');
         $this->assertSame(1, $stats['posts'], 'Hidden posts and event posts are not counted');
-        $this->assertSame(2, $stats['users']);
+        $this->assertSame(2, $stats['users'], 'Members who have not confirmed their email are not counted');
     }
 
     #[Test]

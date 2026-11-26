@@ -50,7 +50,10 @@
         "name": "fas fa-meteor",
         "backgroundColor": "#7c3aed",
         "color": "#fff"
-      }
+      },
+      "optional-dependencies": [
+        "flarum/tags"
+      ]
     },
     "flarum-cli": {
       "modules": {

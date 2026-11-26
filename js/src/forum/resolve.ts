@@ -1,7 +1,6 @@
 import app from 'flarum/forum/app';
 import { HeroCfg, HERO_DEFAULTS, forumStats, fmtCount } from '../common/heroView';
 
-declare const m: import('mithril').Static;
 
 /**
  * Work out which hero to show on the current discussion-list page, and merge the
@@ -20,38 +19,7 @@ export function resolveHero(): HeroCfg | null {
 
   if (override.enabled === false) return null;
 
-  // Base layer — derived from the tag on a tag page, or the forum on the index.
-  let base: Partial<HeroCfg>;
-  let stats: HeroCfg['stats'] = [];
-
-  if (tag) {
-    base = {
-      title: tag.name(),
-      subtitle: tag.attribute('description') || '',
-      icon: tag.attribute('icon') || HERO_DEFAULTS.icon,
-      c1: tag.color() || HERO_DEFAULTS.c1,
-      c2: HERO_DEFAULTS.c2,
-    };
-    const count = tag.discussionCount?.();
-    if (typeof count === 'number') {
-      stats = [{ value: fmtCount(count), icon: 'fas fa-comments', label: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any }];
-    }
-  } else {
-    base = {
-      title: app.forum.attribute('title'),
-      subtitle: app.forum.attribute('description') || '',
-      icon: HERO_DEFAULTS.icon,
-      c1: HERO_DEFAULTS.c1,
-      c2: HERO_DEFAULTS.c2,
-    };
-    // The home hero has no tag to derive a count from, so use the live forum
-    // totals exposed by the backend (discussions / posts / members).
-    stats = forumStats(app.forum.attribute('heroBuilderStats') as any, {
-      discussions: app.translator.trans('ernestdefoe-hero-builder.forum.discussions') as any,
-      posts: app.translator.trans('ernestdefoe-hero-builder.forum.posts') as any,
-      members: app.translator.trans('ernestdefoe-hero-builder.forum.members') as any,
-    });
-  }
+  const { base, stats } = baseLayer(tag);
 
   // Admin-defined custom stats (any context, incl. the home hero which has no
   // auto stat) take priority over the tag-derived count.
@@ -81,6 +49,43 @@ export function resolveHero(): HeroCfg | null {
     shadowCustom: override.shadowCustom || undefined,
     marginTop: override.marginTop != null ? Number(override.marginTop) : undefined,
     marginBottom: override.marginBottom != null ? Number(override.marginBottom) : undefined,
+  };
+}
+
+/**
+ * The base layer and its automatic stats: derived from the tag on a tag page,
+ * or from the forum (with the live forum totals) on the index.
+ */
+function baseLayer(tag: any | null): { base: Partial<HeroCfg>; stats: HeroCfg['stats'] } {
+  const t = (key: string) => app.translator.trans(`ernestdefoe-hero-builder.forum.${key}`) as any;
+
+  if (tag) {
+    const count = tag.discussionCount?.();
+    return {
+      base: {
+        title: tag.name(),
+        subtitle: tag.attribute('description') || '',
+        icon: tag.attribute('icon') || HERO_DEFAULTS.icon,
+        c1: tag.color() || HERO_DEFAULTS.c1,
+        c2: HERO_DEFAULTS.c2,
+      },
+      stats: typeof count === 'number' ? [{ value: fmtCount(count), icon: 'fas fa-comments', label: t('discussions') }] : [],
+    };
+  }
+
+  return {
+    base: {
+      title: app.forum.attribute('title'),
+      subtitle: app.forum.attribute('description') || '',
+      icon: HERO_DEFAULTS.icon,
+      c1: HERO_DEFAULTS.c1,
+      c2: HERO_DEFAULTS.c2,
+    },
+    stats: forumStats(app.forum.attribute('heroBuilderStats') as any, {
+      discussions: t('discussions'),
+      posts: t('posts'),
+      members: t('members'),
+    }),
   };
 }
 

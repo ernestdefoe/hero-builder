@@ -66,6 +66,7 @@ class ForumAssetsTest extends TestCase
     {
         $js = $this->page('/admin', ['authenticatedAs' => 1], 'admin.js')['admin.js'];
 
-        $this->assertStringContainsString('initializers.add("ernestdefoe-hero-builder"', $js);
+        // The Hero Studio is registered through the Admin extender, not an initializer.
+        $this->assertStringContainsString('ernestdefoe-hero-builder.admin.studio.', $js);
     }
 }

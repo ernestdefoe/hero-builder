@@ -5,7 +5,6 @@ import { heroView, HeroCfg, HERO_DEFAULTS, forumStats } from '../../common/heroV
 import cleanSubtitle from '../cleanSubtitle';
 import cleanShadow from '../cleanShadow';
 
-declare const m: import('mithril').Static;
 
 type Ctx = { key: string; label: string; tag?: any };
 type Stat = { value?: string; icon?: string; label?: string };
@@ -156,70 +155,72 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
   }
 
   view() {
-    const t = (k: string) => extractText(app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`));
     const e = this.entry();
-    const off = e.enabled === false;
+    const preview = this.preview();
 
     return m('div.HeroStudio', [
-      m('label.HeroStudio-label', t('context')),
-      m(
-        'div.HeroStudio-tabs',
-        this.loadingTags
-          ? m('span.HeroStudio-loading', t('loading_tags'))
-          : this.contexts().map((c) =>
-              m(
-                'button.HeroStudio-tab',
-                {
-                  className: c.key === this.ctx ? 'active' : '',
-                  type: 'button',
-                  onclick: () => (this.ctx = c.key),
-                },
-                [c.tag ? m('i.icon.fas.fa-tag') : m('i.icon.fas.fa-house'), ' ', c.label]
-              )
-            )
-      ),
-
-      m('div.HeroStudio-preview', { 'data-off': off ? 'true' : null }, heroView(this.preview())),
-
-      m('div.HeroStudio-fields', [
-        this.toggle('enabled', t('show_hero'), e.enabled !== false),
-        this.text('title', t('title'), e.title, this.preview().title),
-        this.textarea('subtitle', t('subtitle'), e.subtitle, t('subtitle_help') as any),
-        this.text('icon', t('icon'), e.icon, this.preview().icon, t('icon_help') as any),
-        this.toggle('iconBg', t('icon_bg'), e.iconBg !== false),
-        m('div.HeroStudio-row', [this.color('c1', t('c1'), e.c1, this.preview().c1), this.color('c2', t('c2'), e.c2, this.preview().c2)]),
-        this.text('image', t('image'), e.image, '', t('image_help') as any),
-        m('div.HeroStudio-row', [
-          this.num('height', t('height'), e.height, '150', t('height_help') as any),
-          this.num('width', t('width'), e.width, t('width_ph') as any),
-        ]),
-        this.toggle('sharpCorners', t('sharp_corners'), e.sharpCorners === true),
-        m('div.HeroStudio-row', [
-          this.num('borderWidth', t('border_width'), e.borderWidth, '1', t('border_width_help') as any),
-          this.color('borderColor', t('border_color'), e.borderColor, 'rgba(255,255,255,0.1)'),
-        ]),
-        this.select('effects', t('effects'), e.effects, [
-          ['', t('effects_animated') as any],
-          ['still', t('effects_still') as any],
-          ['off', t('effects_off') as any],
-        ]),
-        this.select('shadow', t('shadow'), e.shadow, [
-          ['', t('shadow_default') as any],
-          ['none', t('shadow_none') as any],
-          ['soft', t('shadow_soft') as any],
-          ['medium', t('shadow_medium') as any],
-          ['strong', t('shadow_strong') as any],
-          ['custom', t('shadow_custom') as any],
-        ]),
-        e.shadow === 'custom' ? this.shadowField(e) : null,
-        m('div.HeroStudio-row', [
-          this.num('marginTop', t('margin_top'), e.marginTop, '0', t('margin_help') as any, -100),
-          this.num('marginBottom', t('margin_bottom'), e.marginBottom, '18', undefined, -100),
-        ]),
-        this.toggle('showStats', t('show_stats'), e.showStats !== false),
-        e.showStats !== false ? this.statsEditor() : null,
-      ]),
+      m('label.HeroStudio-label', this.t('context')),
+      this.tabs(),
+      m('div.HeroStudio-preview', { 'data-off': e.enabled === false ? 'true' : null }, heroView(preview)),
+      m('div.HeroStudio-fields', this.fields(e, preview)),
     ]);
+  }
+
+  t(key: string): string {
+    return extractText(app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${key}`));
+  }
+
+  /** One button per context: Home, then every tag. */
+  tabs() {
+    return m(
+      'div.HeroStudio-tabs',
+      this.loadingTags
+        ? m('span.HeroStudio-loading', this.t('loading_tags'))
+        : this.contexts().map((c) =>
+            m(
+              'button.HeroStudio-tab',
+              { className: c.key === this.ctx ? 'active' : '', type: 'button', onclick: () => (this.ctx = c.key) },
+              [c.tag ? m('i.icon.fas.fa-tag') : m('i.icon.fas.fa-house'), ' ', c.label]
+            )
+          )
+    );
+  }
+
+  fields(e: Entry, preview: HeroCfg) {
+    const t = (k: string) => this.t(k);
+    return [
+      this.toggle('enabled', t('show_hero'), e.enabled !== false),
+      this.text('title', t('title'), e.title, preview.title),
+      this.textarea('subtitle', t('subtitle'), e.subtitle, t('subtitle_help')),
+      this.text('icon', t('icon'), e.icon, preview.icon, t('icon_help')),
+      this.toggle('iconBg', t('icon_bg'), e.iconBg !== false),
+      m('div.HeroStudio-row', [this.color('c1', t('c1'), e.c1, preview.c1), this.color('c2', t('c2'), e.c2, preview.c2)]),
+      this.text('image', t('image'), e.image, '', t('image_help')),
+      m('div.HeroStudio-row', [this.num('height', t('height'), e.height, '150', t('height_help')), this.num('width', t('width'), e.width, t('width_ph'))]),
+      this.toggle('sharpCorners', t('sharp_corners'), e.sharpCorners === true),
+      m('div.HeroStudio-row', [
+        this.num('borderWidth', t('border_width'), e.borderWidth, '1', t('border_width_help')),
+        this.color('borderColor', t('border_color'), e.borderColor, 'rgba(255,255,255,0.1)'),
+      ]),
+      this.select('effects', t('effects'), e.effects, [
+        ['', t('effects_animated')],
+        ['still', t('effects_still')],
+        ['off', t('effects_off')],
+      ]),
+      this.select(
+        'shadow',
+        t('shadow'),
+        e.shadow,
+        ['', 'none', 'soft', 'medium', 'strong', 'custom'].map((v) => [v, t('shadow_' + (v || 'default'))] as [string, string])
+      ),
+      e.shadow === 'custom' ? this.shadowField(e) : null,
+      m('div.HeroStudio-row', [
+        this.num('marginTop', t('margin_top'), e.marginTop, '0', t('margin_help'), -100),
+        this.num('marginBottom', t('margin_bottom'), e.marginBottom, '18', undefined, -100),
+      ]),
+      this.toggle('showStats', t('show_stats'), e.showStats !== false),
+      e.showStats !== false ? this.statsEditor() : null,
+    ];
   }
 
   /** Same rule as the server: a custom value that fails the grammar falls back to the default shadow. */
@@ -230,7 +231,7 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
   }
 
   shadowField(e: Entry) {
-    const t = (k: string) => extractText(app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`));
+    const t = (k: string) => this.t(k);
     const bad = (e.shadowCustom || '').trim() !== '' && cleanShadow(e.shadowCustom || '') === null;
     return m('div.Form-group.HeroStudio-field', [
       m('label', t('shadow_custom_value')),
@@ -311,7 +312,7 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
   /** Repeatable custom-stat editor (value / FA icon / label). Lets ANY hero —
    *  including the home page, which has no auto stat — show stats in the header. */
   statsEditor() {
-    const t = (k: string) => extractText(app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`));
+    const t = (k: string) => this.t(k);
     const rows: Stat[] = Array.isArray(this.entry().stats) ? (this.entry().stats as Stat[]) : [];
     return m('div.Form-group.HeroStudio-field.HeroStudio-stats', [
       m('label', t('stats_custom')),

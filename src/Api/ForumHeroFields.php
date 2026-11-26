@@ -62,30 +62,7 @@ class ForumHeroFields
             return [];
         }
 
-        // A subtitle with HTML in it is sent cleaned, as subtitleHtml, and the
-        // raw text is never sent. Plain text stays as it is.
-        // A custom shadow is only sent once it passes ShadowValue's grammar;
-        // otherwise the hero falls back to the default shadow.
-        foreach ($heroes as &$hero) {
-            if (! is_array($hero)) {
-                continue;
-            }
-            if (is_string($hero['subtitle'] ?? null) && SubtitleHtml::looksLikeHtml($hero['subtitle'])) {
-                $hero['subtitleHtml'] = SubtitleHtml::clean($hero['subtitle']);
-                unset($hero['subtitle']);
-            }
-            if (($hero['shadow'] ?? null) === 'custom') {
-                $shadow = is_string($hero['shadowCustom'] ?? null) ? ShadowValue::clean($hero['shadowCustom']) : null;
-                if ($shadow === null) {
-                    unset($hero['shadow'], $hero['shadowCustom']);
-                } else {
-                    $hero['shadowCustom'] = $shadow;
-                }
-            } else {
-                unset($hero['shadowCustom']);
-            }
-        }
-        unset($hero);
+        $heroes = array_map(fn ($hero) => is_array($hero) ? $this->forForum($hero) : $hero, $heroes);
 
         $tagIds = [];
         foreach (array_keys($heroes) as $key) {
@@ -108,5 +85,37 @@ class ForumHeroFields
             fn ($key) => ! str_starts_with((string) $key, 'tag:') || in_array((int) substr((string) $key, 4), $visible, true),
             ARRAY_FILTER_USE_KEY
         );
+    }
+
+    /**
+     * A subtitle with HTML in it is sent cleaned, as subtitleHtml, and the raw
+     * text is never sent; plain text stays as it is. A custom shadow is only
+     * sent once it passes ShadowValue's grammar, otherwise the hero falls back
+     * to the default shadow.
+     *
+     * @param array<string, mixed> $hero
+     * @return array<string, mixed>
+     */
+    private function forForum(array $hero): array
+    {
+        if (is_string($hero['subtitle'] ?? null) && SubtitleHtml::looksLikeHtml($hero['subtitle'])) {
+            $hero['subtitleHtml'] = SubtitleHtml::clean($hero['subtitle']);
+            unset($hero['subtitle']);
+        }
+
+        $shadow = ($hero['shadow'] ?? null) === 'custom' && is_string($hero['shadowCustom'] ?? null)
+            ? ShadowValue::clean($hero['shadowCustom'])
+            : null;
+
+        if ($shadow !== null) {
+            $hero['shadowCustom'] = $shadow;
+        } else {
+            unset($hero['shadowCustom']);
+            if (($hero['shadow'] ?? null) === 'custom') {
+                unset($hero['shadow']);
+            }
+        }
+
+        return $hero;
     }
 }

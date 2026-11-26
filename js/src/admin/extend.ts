@@ -2,8 +2,6 @@ import app from 'flarum/admin/app';
 import Admin from 'flarum/common/extenders/Admin';
 import HeroStudio from './components/HeroStudio';
 
-declare const m: import('mithril').Static;
-
 // Hero Builder settings via Flarum 2's JS Admin extender (the 1.x app.extensionData
 // API is removed — using it throws "failed to initialize"). A master on/off switch,
 // then the live Hero Studio: per-context (home + every tag) editing with a live

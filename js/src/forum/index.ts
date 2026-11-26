@@ -17,3 +17,5 @@ app.initializers.add('ernestdefoe-hero-builder', () => {
     return HeroBanner.component({ cfg });
   });
 });
+
+export { default as extend } from './extend';

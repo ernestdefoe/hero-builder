@@ -16,18 +16,19 @@ return [
         ->js(__DIR__.'/js/dist/forum.js')
         ->css(__DIR__.'/less/forum.less'),
 
-    // The admin loads the same hero CSS so the Hero Studio live preview matches.
+    // The admin loads the same hero CSS so the Hero Studio live preview
+    // matches, plus the Studio's own styles, which forum visitors never need.
     (new Extend\Frontend('admin'))
         ->js(__DIR__.'/js/dist/admin.js')
-        ->css(__DIR__.'/less/forum.less'),
+        ->css(__DIR__.'/less/forum.less')
+        ->css(__DIR__.'/less/admin.less'),
 
     new Extend\Locales(__DIR__.'/resources/locale'),
 
     (new Extend\Settings())
-        // Master on/off. Defaults to TRUE when unset — Flarum's serializeToForum
-        // has no default argument, so the closure supplies it (a plain 'boolval'
-        // would turn the unset null into false).
-        ->serializeToForum('heroBuilder.enabled', 'ernestdefoe-hero-builder.enabled', fn ($v) => $v === null ? true : (bool) (int) $v),
+        // Master on/off, on until an admin turns it off.
+        ->default('ernestdefoe-hero-builder.enabled', '1')
+        ->serializeToForum('heroBuilder.enabled', 'ernestdefoe-hero-builder.enabled', fn ($v) => (bool) (int) $v),
 
     // The hero map (filtered to the tags the visitor can see) and the cached
     // live counts. An invokable class so its dependencies are injected.

@@ -1,4 +1,3 @@
-declare const m: import('mithril').Static;
 
 /** A fully-resolved hero config — everything needed to render one banner. */
 export interface HeroCfg {
@@ -121,49 +120,12 @@ export function forumStats(
  * admin Hero Studio (the live preview), so the two never drift.
  */
 export function heroView(cfg: HeroCfg) {
-  const grad = `linear-gradient(135deg, ${cfg.c1}, ${cfg.c2})`;
-  const style: Record<string, string> = { background: cfg.image ? '#0b0a14' : grad };
-  if (cfg.height) style.minHeight = cfg.height + 'px';
-  if (cfg.width) {
-    style.maxWidth = cfg.width + 'px';
-    style.marginLeft = 'auto';
-    style.marginRight = 'auto';
-  }
-  if (cfg.borderWidth != null) {
-    style.border = cfg.borderWidth > 0 ? `${cfg.borderWidth}px solid ${cfg.borderColor || 'rgba(255,255,255,0.1)'}` : 'none';
-  } else if (cfg.borderColor) {
-    style.borderColor = cfg.borderColor;
-  }
-  if (cfg.shadow === 'custom') {
-    if (cfg.shadowCustom) style.boxShadow = cfg.shadowCustom;
-  } else if (cfg.shadow && HERO_SHADOWS[cfg.shadow]) style.boxShadow = HERO_SHADOWS[cfg.shadow];
-  if (cfg.marginTop != null) style.marginTop = cfg.marginTop + 'px';
-  if (cfg.marginBottom != null) style.marginBottom = cfg.marginBottom + 'px';
-
   const effects = cfg.effects || 'animated';
   const classes = [cfg.sharpCorners ? 'HeroBanner--sharp' : '', effects === 'still' ? 'HeroBanner--still' : ''].filter(Boolean).join(' ');
 
-  return m('div.HeroBanner', { className: classes, style }, [
+  return m('div.HeroBanner', { className: classes, style: heroStyle(cfg) }, [
     cfg.image ? m('img.HeroBanner-cover', { src: cfg.image, alt: '' }) : null,
-    effects === 'off'
-      ? null
-      : m('span.HeroBanner-blob', {
-          style: { background: `radial-gradient(circle, ${cfg.c1}, transparent 70%)`, left: '-50px', top: '-80px' },
-          'aria-hidden': 'true',
-        }),
-    effects === 'off'
-      ? null
-      : m('span.HeroBanner-blob', {
-          style: {
-            background: `radial-gradient(circle, ${cfg.c2}, transparent 70%)`,
-            right: '-40px',
-            top: '-50px',
-            animationDuration: '11s',
-            animationDelay: '-3s',
-          },
-          'aria-hidden': 'true',
-        }),
-    effects === 'off' ? null : m('span.HeroBanner-sheen', { 'aria-hidden': 'true' }),
+    effects === 'off' ? null : heroEffects(cfg),
     m('span.HeroBanner-wash', { 'aria-hidden': 'true' }),
     m('div.HeroBanner-body', [
       cfg.iconBg !== false
@@ -184,17 +146,62 @@ export function heroView(cfg: HeroCfg) {
             ? m('p.HeroBanner-subtitle', cfg.subtitle)
             : null,
       ]),
-      cfg.showStats !== false && cfg.stats && cfg.stats.length
-        ? m(
-            'div.HeroBanner-stats',
-            cfg.stats.map((s) =>
-              m('div.HeroBanner-stat', [
-                m('span.HeroBanner-stat-ico', m('i', { className: s.icon, title: s.label, 'aria-label': s.label })),
-                m('span.HeroBanner-stat-num', s.value),
-              ])
-            )
-          )
-        : null,
+      cfg.showStats !== false && cfg.stats && cfg.stats.length ? heroStats(cfg.stats) : null,
     ]),
   ]);
+}
+
+/** The banner's inline style: background, size, border, shadow and margins. */
+function heroStyle(cfg: HeroCfg): Record<string, string> {
+  const style: Record<string, string> = { background: cfg.image ? '#0b0a14' : `linear-gradient(135deg, ${cfg.c1}, ${cfg.c2})` };
+  if (cfg.height) style.minHeight = cfg.height + 'px';
+  if (cfg.width) {
+    style.maxWidth = cfg.width + 'px';
+    style.marginLeft = 'auto';
+    style.marginRight = 'auto';
+  }
+  if (cfg.borderWidth != null) {
+    style.border = cfg.borderWidth > 0 ? `${cfg.borderWidth}px solid ${cfg.borderColor || 'rgba(255,255,255,0.1)'}` : 'none';
+  } else if (cfg.borderColor) {
+    style.borderColor = cfg.borderColor;
+  }
+  if (cfg.shadow === 'custom') {
+    if (cfg.shadowCustom) style.boxShadow = cfg.shadowCustom;
+  } else if (cfg.shadow && HERO_SHADOWS[cfg.shadow]) style.boxShadow = HERO_SHADOWS[cfg.shadow];
+  if (cfg.marginTop != null) style.marginTop = cfg.marginTop + 'px';
+  if (cfg.marginBottom != null) style.marginBottom = cfg.marginBottom + 'px';
+  return style;
+}
+
+/** The two drifting glow shapes and the sheen behind the text. */
+function heroEffects(cfg: HeroCfg) {
+  return [
+    m('span.HeroBanner-blob', {
+      style: { background: `radial-gradient(circle, ${cfg.c1}, transparent 70%)`, left: '-50px', top: '-80px' },
+      'aria-hidden': 'true',
+    }),
+    m('span.HeroBanner-blob', {
+      style: {
+        background: `radial-gradient(circle, ${cfg.c2}, transparent 70%)`,
+        right: '-40px',
+        top: '-50px',
+        animationDuration: '11s',
+        animationDelay: '-3s',
+      },
+      'aria-hidden': 'true',
+    }),
+    m('span.HeroBanner-sheen', { 'aria-hidden': 'true' }),
+  ];
+}
+
+function heroStats(stats: NonNullable<HeroCfg['stats']>) {
+  return m(
+    'div.HeroBanner-stats',
+    stats.map((s) =>
+      m('div.HeroBanner-stat', [
+        m('span.HeroBanner-stat-ico', m('i', { className: s.icon, title: s.label, 'aria-label': s.label })),
+        m('span.HeroBanner-stat-num', s.value),
+      ])
+    )
+  );
 }

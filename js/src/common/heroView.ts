@@ -29,8 +29,10 @@ export interface HeroCfg {
    * 'animated'; 'still' keeps the look without the motion; 'off' removes them.
    */
   effects?: 'animated' | 'still' | 'off';
-  /** Drop-shadow strength. Unset → the CSS default. */
-  shadow?: 'none' | 'soft' | 'medium' | 'strong';
+  /** Drop-shadow strength. Unset → the CSS default; 'custom' uses `shadowCustom`. */
+  shadow?: 'none' | 'soft' | 'medium' | 'strong' | 'custom';
+  /** A box-shadow value already checked by the server's ShadowValue grammar. */
+  shadowCustom?: string;
   /** Space above the banner in px (also lets you close/adjust the header gap). */
   marginTop?: number;
   /** Space below the banner in px (falls back to the CSS default when unset). */
@@ -132,7 +134,9 @@ export function heroView(cfg: HeroCfg) {
   } else if (cfg.borderColor) {
     style.borderColor = cfg.borderColor;
   }
-  if (cfg.shadow && HERO_SHADOWS[cfg.shadow]) style.boxShadow = HERO_SHADOWS[cfg.shadow];
+  if (cfg.shadow === 'custom') {
+    if (cfg.shadowCustom) style.boxShadow = cfg.shadowCustom;
+  } else if (cfg.shadow && HERO_SHADOWS[cfg.shadow]) style.boxShadow = HERO_SHADOWS[cfg.shadow];
   if (cfg.marginTop != null) style.marginTop = cfg.marginTop + 'px';
   if (cfg.marginBottom != null) style.marginBottom = cfg.marginBottom + 'px';
 

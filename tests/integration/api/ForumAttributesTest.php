@@ -126,4 +126,20 @@ class ForumAttributesTest extends TestCase
         $this->assertSame(['subtitleHtml' => '<p>Hi there</p>'], $heroes['home'], 'The raw subtitle is never sent');
         $this->assertSame(['subtitle' => 'Tips &amp; tricks <3, 1 < 2'], $heroes['plain'], 'A "<" that is not a tag stays plain text');
     }
+
+    #[Test]
+    public function a_custom_shadow_is_sent_only_when_it_passes_the_grammar()
+    {
+        $this->setting('ernestdefoe-hero-builder.heroes', json_encode([
+            'home' => ['shadow' => 'custom', 'shadowCustom' => ' 0  8px 24px  var(--shadow-color) '],
+            'bad' => ['shadow' => 'custom', 'shadowCustom' => '0 0 red; background: url(https://evil.example/x)'],
+            'stale' => ['shadow' => 'soft', 'shadowCustom' => 'url(x)'],
+        ]));
+
+        $heroes = $this->forum()['heroBuilder.heroes'];
+
+        $this->assertSame(['shadow' => 'custom', 'shadowCustom' => '0 8px 24px var(--shadow-color)'], $heroes['home']);
+        $this->assertSame([], $heroes['bad'], 'A value outside the grammar falls back to the default shadow and is never sent');
+        $this->assertSame(['shadow' => 'soft'], $heroes['stale'], 'A custom value left behind under a preset is not sent');
+    }
 }

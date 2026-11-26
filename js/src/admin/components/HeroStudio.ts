@@ -3,6 +3,7 @@ import Component from 'flarum/common/Component';
 import extractText from 'flarum/common/utils/extractText';
 import { heroView, HeroCfg, HERO_DEFAULTS, forumStats } from '../../common/heroView';
 import cleanSubtitle from '../cleanSubtitle';
+import cleanShadow from '../cleanShadow';
 
 declare const m: import('mithril').Static;
 
@@ -26,6 +27,7 @@ type Entry = {
   borderWidth?: number;
   borderColor?: string;
   shadow?: string;
+  shadowCustom?: string;
   marginTop?: number;
   marginBottom?: number;
 };
@@ -147,7 +149,7 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
       borderWidth: e.borderWidth != null ? Number(e.borderWidth) : undefined,
       borderColor: e.borderColor || undefined,
       effects: (e.effects as any) || undefined,
-      shadow: (e.shadow as any) || undefined,
+      ...this.previewShadow(e),
       marginTop: e.marginTop != null ? Number(e.marginTop) : undefined,
       marginBottom: e.marginBottom != null ? Number(e.marginBottom) : undefined,
     };
@@ -207,7 +209,9 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
           ['soft', t('shadow_soft') as any],
           ['medium', t('shadow_medium') as any],
           ['strong', t('shadow_strong') as any],
+          ['custom', t('shadow_custom') as any],
         ]),
+        e.shadow === 'custom' ? this.shadowField(e) : null,
         m('div.HeroStudio-row', [
           this.num('marginTop', t('margin_top'), e.marginTop, '0', t('margin_help') as any, -100),
           this.num('marginBottom', t('margin_bottom'), e.marginBottom, '18', undefined, -100),
@@ -215,6 +219,29 @@ export default class HeroStudio extends Component<{ valueStream: (v?: string) =>
         this.toggle('showStats', t('show_stats'), e.showStats !== false),
         e.showStats !== false ? this.statsEditor() : null,
       ]),
+    ]);
+  }
+
+  /** Same rule as the server: a custom value that fails the grammar falls back to the default shadow. */
+  previewShadow(e: Entry): Pick<HeroCfg, 'shadow' | 'shadowCustom'> {
+    if (e.shadow !== 'custom') return { shadow: (e.shadow as any) || undefined };
+    const clean = cleanShadow(e.shadowCustom || '');
+    return clean === null ? {} : { shadow: 'custom', shadowCustom: clean };
+  }
+
+  shadowField(e: Entry) {
+    const t = (k: string) => extractText(app.translator.trans(`ernestdefoe-hero-builder.admin.studio.${k}`));
+    const bad = (e.shadowCustom || '').trim() !== '' && cleanShadow(e.shadowCustom || '') === null;
+    return m('div.Form-group.HeroStudio-field', [
+      m('label', t('shadow_custom_value')),
+      m('input.FormControl', {
+        type: 'text',
+        value: e.shadowCustom || '',
+        placeholder: '0 12px 32px -12px rgba(0, 0, 0, 0.5)',
+        'aria-invalid': bad ? 'true' : null,
+        oninput: (ev: any) => this.set('shadowCustom', ev.target.value),
+      }),
+      m('p.helpText', bad ? m('strong.HeroStudio-error', t('shadow_custom_invalid')) : t('shadow_custom_help')),
     ]);
   }
 

@@ -78,6 +78,7 @@ export function resolveHero(): HeroCfg | null {
     borderColor: override.borderColor || undefined,
     effects: override.effects || undefined,
     shadow: override.shadow || undefined,
+    shadowCustom: override.shadowCustom || undefined,
     marginTop: override.marginTop != null ? Number(override.marginTop) : undefined,
     marginBottom: override.marginBottom != null ? Number(override.marginBottom) : undefined,
   };

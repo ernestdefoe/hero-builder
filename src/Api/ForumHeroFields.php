@@ -7,6 +7,7 @@
 
 namespace ErnestDefoe\HeroBuilder\Api;
 
+use ErnestDefoe\HeroBuilder\ShadowValue;
 use ErnestDefoe\HeroBuilder\SubtitleHtml;
 use Flarum\Api\Context;
 use Flarum\Api\Schema\Attribute;
@@ -63,10 +64,25 @@ class ForumHeroFields
 
         // A subtitle with HTML in it is sent cleaned, as subtitleHtml, and the
         // raw text is never sent. Plain text stays as it is.
+        // A custom shadow is only sent once it passes ShadowValue's grammar;
+        // otherwise the hero falls back to the default shadow.
         foreach ($heroes as &$hero) {
-            if (is_array($hero) && is_string($hero['subtitle'] ?? null) && SubtitleHtml::looksLikeHtml($hero['subtitle'])) {
+            if (! is_array($hero)) {
+                continue;
+            }
+            if (is_string($hero['subtitle'] ?? null) && SubtitleHtml::looksLikeHtml($hero['subtitle'])) {
                 $hero['subtitleHtml'] = SubtitleHtml::clean($hero['subtitle']);
                 unset($hero['subtitle']);
+            }
+            if (($hero['shadow'] ?? null) === 'custom') {
+                $shadow = is_string($hero['shadowCustom'] ?? null) ? ShadowValue::clean($hero['shadowCustom']) : null;
+                if ($shadow === null) {
+                    unset($hero['shadow'], $hero['shadowCustom']);
+                } else {
+                    $hero['shadowCustom'] = $shadow;
+                }
+            } else {
+                unset($hero['shadowCustom']);
             }
         }
         unset($hero);
